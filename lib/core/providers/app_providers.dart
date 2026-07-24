@@ -372,6 +372,57 @@ final servingsProvider =
     AsyncNotifierProvider<ServingsNotifier, Map<String, double>>(ServingsNotifier.new);
 
 // ---------------------------------------------------------------------------
+// Reactive, persisted single-value preferences. Backed by the settings table
+// (read synchronously from the preloaded cache, so no first-frame flash) but
+// exposed as providers so a change on one screen updates every screen live.
+// ---------------------------------------------------------------------------
+
+/// The meal-plan's selected day. Shared across both places MealPlanBody is
+/// shown so they stay in sync.
+class SelectedDayNotifier extends Notifier<int> {
+  @override
+  int build() =>
+      int.tryParse(ref.read(dbProvider).getSettingSync('plan_selected_day') ?? '1') ?? 1;
+
+  void set(int day) {
+    state = day;
+    ref.read(dbProvider).setSetting('plan_selected_day', '$day');
+  }
+}
+
+final selectedDayProvider = NotifierProvider<SelectedDayNotifier, int>(SelectedDayNotifier.new);
+
+/// The Journey goal target weight in kg (null until the user picks one).
+class JourneyTargetNotifier extends Notifier<double?> {
+  @override
+  double? build() =>
+      double.tryParse(ref.read(dbProvider).getSettingSync('journey_target_kg') ?? '');
+
+  void set(double kg) {
+    state = kg;
+    ref.read(dbProvider).setSetting('journey_target_kg', kg.toString());
+  }
+}
+
+final journeyTargetProvider =
+    NotifierProvider<JourneyTargetNotifier, double?>(JourneyTargetNotifier.new);
+
+/// The Journey pace in kg/week.
+class JourneyRateNotifier extends Notifier<double> {
+  @override
+  double build() =>
+      double.tryParse(ref.read(dbProvider).getSettingSync('journey_rate') ?? '') ?? 0.5;
+
+  void set(double rate) {
+    state = rate;
+    ref.read(dbProvider).setSetting('journey_rate', rate.toString());
+  }
+}
+
+final journeyRateProvider =
+    NotifierProvider<JourneyRateNotifier, double>(JourneyRateNotifier.new);
+
+// ---------------------------------------------------------------------------
 // Journey: weigh-ins
 // ---------------------------------------------------------------------------
 

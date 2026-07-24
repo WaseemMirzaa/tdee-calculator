@@ -9,6 +9,7 @@ import '../../core/tdee_engine.dart';
 import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/util/units.dart';
 import '../../widgets/vita.dart';
 
 /// ★ S14 · Journey — the flagship differentiator. Turns a one-shot calculation
@@ -22,27 +23,19 @@ class JourneyScreen extends ConsumerStatefulWidget {
 }
 
 class _JourneyScreenState extends ConsumerState<JourneyScreen> {
-  // Restored from the last session so the user's goal target + pace persist.
-  late double? _targetKg =
-      double.tryParse(ref.read(dbProvider).getSettingSync('journey_target_kg') ?? '');
-  late double _rate =
-      double.tryParse(ref.read(dbProvider).getSettingSync('journey_rate') ?? '') ?? 0.5; // kg/week
-
-  void _setTarget(double t) {
-    setState(() => _targetKg = t);
-    ref.read(dbProvider).setSetting('journey_target_kg', t.toString());
-  }
-
-  void _setRate(double r) {
-    setState(() => _rate = r);
-    ref.read(dbProvider).setSetting('journey_rate', r.toString());
-  }
+  void _setTarget(double t) => ref.read(journeyTargetProvider.notifier).set(t);
+  void _setRate(double r) => ref.read(journeyRateProvider.notifier).set(r);
 
   @override
   Widget build(BuildContext context) {
     final result = ref.watch(resultProvider);
     final profile = ref.watch(profileProvider).valueOrNull;
     final weighIns = ref.watch(weighInsProvider).valueOrNull ?? const <WeighIn>[];
+    // Goal target + pace are reactive/persisted providers so they update live
+    // (e.g. when the Energy screen hands off a rate).
+    final targetSaved = ref.watch(journeyTargetProvider);
+    final rate = ref.watch(journeyRateProvider);
+    final unit = ref.watch(unitSystemProvider);
     final v = context.vita;
 
     if (result == null || profile == null) {
@@ -50,9 +43,9 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
     }
 
     final currentKg = weighIns.isNotEmpty ? weighIns.last.weightKg : profile.weightKg;
-    final target = _targetKg ?? _defaultTarget(currentKg, profile.goal);
+    final target = targetSaved ?? _defaultTarget(currentKg, profile.goal);
     final losing = target < currentKg;
-    final dailyDelta = (losing ? -1 : 1) * TdeeCalculator.dailyDeltaForRate(_rate);
+    final dailyDelta = (losing ? -1 : 1) * TdeeCalculator.dailyDeltaForRate(rate);
     final weeks = JourneyMath.weeksToGoal(currentKg: currentKg, targetKg: target, dailyDeltaKcal: dailyDelta);
     final date = JourneyMath.projectedDate(
         currentKg: currentKg, targetKg: target, dailyDeltaKcal: dailyDelta, from: DateTime.now());
@@ -67,7 +60,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
             const Spacer(),
             FilledButton.icon(
               style: FilledButton.styleFrom(backgroundColor: v.brand, foregroundColor: Colors.white),
-              onPressed: () => _logWeighIn(currentKg),
+              onPressed: () => _logWeighIn(currentKg, unit),
               icon: const Icon(Icons.add_rounded, size: 18),
               label: const Text('Log weight'),
             ),
@@ -76,21 +69,22 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
         const SizedBox(height: 14),
 
         // Current + change
-        _StatStrip(weighIns: weighIns, currentKg: currentKg),
+        _StatStrip(weighIns: weighIns, currentKg: currentKg, unit: unit),
         const SizedBox(height: 14),
 
         // Trend chart
         if (weighIns.length >= 2)
-          _TrendCard(weighIns: weighIns)
+          _TrendCard(weighIns: weighIns, unit: unit)
         else
-          _EmptyTrend(onLog: () => _logWeighIn(currentKg)),
+          _EmptyTrend(onLog: () => _logWeighIn(currentKg, unit)),
         const SizedBox(height: 14),
 
         // Goal simulator
         _SimulatorCard(
           currentKg: currentKg,
           targetKg: target,
-          rate: _rate,
+          rate: rate,
+          unit: unit,
           weeks: weeks,
           date: date,
           dailyDelta: dailyDelta,
@@ -116,10 +110,12 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
         Goal.maintainWeight => current,
       };
 
-  Future<void> _logWeighIn(double current) async {
-    final controller = TextEditingController(text: current.toStringAsFixed(1));
+  Future<void> _logWeighIn(double current, UnitSystem unit) async {
+    // Prefill + accept input in the active unit; store canonical kg.
+    final controller =
+        TextEditingController(text: Units.displayWeight(current, unit).toStringAsFixed(1));
     final v = context.vita;
-    final value = await showDialog<double>(
+    final entered = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: v.card,
@@ -128,7 +124,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
           controller: controller,
           autofocus: true,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(suffixText: 'kg'),
+          decoration: InputDecoration(suffixText: Units.weightUnit(unit)),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
@@ -140,8 +136,10 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
         ],
       ),
     );
-    if (value != null && value > 20 && value < 400) {
-      await ref.read(weighInsProvider.notifier).add(DateTime.now(), value);
+    if (entered == null) return;
+    final kg = Units.weightToKg(entered, unit);
+    if (kg > 20 && kg < 400) {
+      await ref.read(weighInsProvider.notifier).add(DateTime.now(), kg);
     }
   }
 }
@@ -149,19 +147,21 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
 // ---------------------------------------------------------------------------
 
 class _StatStrip extends StatelessWidget {
-  const _StatStrip({required this.weighIns, required this.currentKg});
+  const _StatStrip({required this.weighIns, required this.currentKg, required this.unit});
   final List<WeighIn> weighIns;
   final double currentKg;
+  final UnitSystem unit;
 
   @override
   Widget build(BuildContext context) {
     final change = JourneyMath.netChangeKg(weighIns);
+    final u = Units.weightUnit(unit);
     final v = context.vita;
     return Row(
       children: [
-        Expanded(child: _stat(context, 'Current', '${currentKg.toStringAsFixed(1)} kg', v.ink)),
+        Expanded(child: _stat(context, 'Current', '${Units.displayWeight(currentKg, unit).toStringAsFixed(1)} $u', v.ink)),
         const SizedBox(width: 10),
-        Expanded(child: _stat(context, 'Change', change == null ? '—' : '${change > 0 ? '+' : ''}${change.toStringAsFixed(1)} kg',
+        Expanded(child: _stat(context, 'Change', change == null ? '—' : '${change > 0 ? '+' : ''}${Units.displayWeight(change, unit).toStringAsFixed(1)} $u',
             change == null ? v.muted : (change <= 0 ? VitaColors.good : VitaColors.ember))),
         const SizedBox(width: 10),
         Expanded(child: _stat(context, 'Entries', '${weighIns.length}', v.ink)),
@@ -208,16 +208,18 @@ class _EmptyTrend extends StatelessWidget {
 }
 
 class _TrendCard extends StatelessWidget {
-  const _TrendCard({required this.weighIns});
+  const _TrendCard({required this.weighIns, required this.unit});
   final List<WeighIn> weighIns;
+  final UnitSystem unit;
 
   @override
   Widget build(BuildContext context) {
     final v = context.vita;
     final smoothed = JourneyMath.smoothedTrend(weighIns);
-    final raw = [for (var i = 0; i < weighIns.length; i++) FlSpot(i.toDouble(), weighIns[i].weightKg)];
-    final trend = [for (var i = 0; i < smoothed.length; i++) FlSpot(i.toDouble(), smoothed[i])];
-    final values = weighIns.map((w) => w.weightKg).toList();
+    double d(double kg) => Units.displayWeight(kg, unit);
+    final raw = [for (var i = 0; i < weighIns.length; i++) FlSpot(i.toDouble(), d(weighIns[i].weightKg))];
+    final trend = [for (var i = 0; i < smoothed.length; i++) FlSpot(i.toDouble(), d(smoothed[i]))];
+    final values = weighIns.map((w) => d(w.weightKg)).toList();
     final minY = (values.reduce((a, b) => a < b ? a : b) - 1);
     final maxY = (values.reduce((a, b) => a > b ? a : b) + 1);
 
@@ -304,6 +306,7 @@ class _SimulatorCard extends StatelessWidget {
     required this.currentKg,
     required this.targetKg,
     required this.rate,
+    required this.unit,
     required this.weeks,
     required this.date,
     required this.dailyDelta,
@@ -314,6 +317,7 @@ class _SimulatorCard extends StatelessWidget {
   final double currentKg;
   final double targetKg;
   final double rate;
+  final UnitSystem unit;
   final double? weeks;
   final DateTime? date;
   final double dailyDelta;
@@ -326,6 +330,7 @@ class _SimulatorCard extends StatelessWidget {
     final v = context.vita;
     final lo = (currentKg - 20).clamp(35.0, 300.0);
     final hi = (currentKg + 20).clamp(35.0, 300.0);
+    final u = Units.weightUnit(unit);
     final dateStr = date != null ? DateFormat('MMM d, yyyy').format(date!) : '—';
     final weeksStr = weeks == null ? '—' : (weeks == 0 ? 'now' : '≈ ${weeks!.ceil()} wk');
 
@@ -351,7 +356,7 @@ class _SimulatorCard extends StatelessWidget {
                 children: [
                   const SectionLabel('Target weight'),
                   const SizedBox(height: 2),
-                  Text('${targetKg.toStringAsFixed(1)} kg', style: context.mono(size: 26)),
+                  Text('${Units.displayWeight(targetKg, unit).toStringAsFixed(1)} $u', style: context.mono(size: 26)),
                 ],
               ),
               Column(
@@ -381,9 +386,9 @@ class _SimulatorCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${lo.toStringAsFixed(0)} kg', style: context.mono(size: 11, color: v.muted)),
+              Text('${Units.displayWeight(lo, unit).toStringAsFixed(0)} $u', style: context.mono(size: 11, color: v.muted)),
               Text(weeksStr, style: context.mono(size: 11, color: v.muted)),
-              Text('${hi.toStringAsFixed(0)} kg', style: context.mono(size: 11, color: v.muted)),
+              Text('${Units.displayWeight(hi, unit).toStringAsFixed(0)} $u', style: context.mono(size: 11, color: v.muted)),
             ],
           ),
           const SizedBox(height: 14),
@@ -392,10 +397,9 @@ class _SimulatorCard extends StatelessWidget {
           VitaSegmented<double>(
             value: rate,
             onChanged: onRate,
-            segments: const [
-              VitaSegment(0.25, '0.25 kg/wk'),
-              VitaSegment(0.5, '0.5 kg/wk'),
-              VitaSegment(1.0, '1 kg/wk'),
+            segments: [
+              for (final r in const [0.25, 0.5, 1.0])
+                VitaSegment(r, '${_fmtRate(r, unit)} $u/wk'),
             ],
           ),
           const SizedBox(height: 16),
@@ -405,12 +409,22 @@ class _SimulatorCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(child: _pill(context, '${intakeTarget.round()}', 'intake target', v.brand)),
               const SizedBox(width: 10),
-              Expanded(child: _pill(context, rate.toString(), 'kg/week', v.ink)),
+              Expanded(child: _pill(context, _fmtRate(rate, unit), '$u/week', v.ink)),
             ],
           ),
         ],
       ),
     );
+  }
+
+  /// Format a kg/week pace for the active unit (kg shown as-is, lb to 1 dp).
+  String _fmtRate(double kgPerWeek, UnitSystem unit) {
+    if (unit == UnitSystem.metric) {
+      return kgPerWeek == kgPerWeek.roundToDouble()
+          ? kgPerWeek.toStringAsFixed(0)
+          : kgPerWeek.toString();
+    }
+    return Units.displayWeight(kgPerWeek, unit).toStringAsFixed(1);
   }
 
   Widget _pill(BuildContext context, String n, String l, Color c) {

@@ -43,13 +43,9 @@ class MealPlanBody extends ConsumerStatefulWidget {
 }
 
 class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
-  late int _day = int.tryParse(ref.read(dbProvider).getSettingSync('plan_selected_day') ?? '1') ?? 1;
   bool _busy = false;
 
-  void _setDay(int n) {
-    setState(() => _day = n);
-    ref.read(dbProvider).setSetting('plan_selected_day', '$n');
-  }
+  void _setDay(int n) => ref.read(selectedDayProvider.notifier).set(n);
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +54,7 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
     final profile = ref.watch(profileProvider).valueOrNull;
     final favorites = ref.watch(favoritesProvider).valueOrNull ?? <String>{};
     final servings = ref.watch(servingsProvider).valueOrNull ?? const <String, double>{};
+    final selectedDay = ref.watch(selectedDayProvider);
     final v = context.vita;
 
     return planAsync.when(
@@ -65,8 +62,8 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
       error: (e, _) => Center(child: Text('$e')),
       data: (days) {
         if (days.isEmpty) return const SizedBox.shrink();
-        _day = _day.clamp(1, days.length);
-        final today = days.firstWhere((d) => d.dayNumber == _day, orElse: () => days.first);
+        final day = selectedDay.clamp(1, days.length);
+        final today = days.firstWhere((d) => d.dayNumber == day, orElse: () => days.first);
         double sv(int slot) => servings['${today.dayNumber}:$slot'] ?? 1.0;
         // Day macro/kcal totals scaled by each slot's chosen serving size.
         var dayKcal = 0.0, dayP = 0.0, dayC = 0.0, dayF = 0.0;
@@ -93,7 +90,7 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (context, i) {
                   final n = days[i].dayNumber;
-                  final sel = n == _day;
+                  final sel = n == day;
                   return GestureDetector(
                     onTap: () => _setDay(n),
                     child: Container(
@@ -176,11 +173,8 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
     // Append one day; existing days are preserved untouched.
     final newDay = await ref.read(planProvider.notifier).appendDay(targetCalories: target);
     if (mounted) {
-      setState(() {
-        _busy = false;
-        _day = newDay;
-      });
-      ref.read(dbProvider).setSetting('plan_selected_day', '$newDay');
+      setState(() => _busy = false);
+      _setDay(newDay);
     }
   }
 

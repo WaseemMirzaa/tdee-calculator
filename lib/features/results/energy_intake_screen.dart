@@ -31,7 +31,10 @@ class EnergyIntakeScreen extends ConsumerWidget {
     if (result == null) return const Scaffold(body: SizedBox.shrink());
     final maint = result.maintenanceCalories;
 
-    void openJourney() {
+    // Hand off the tapped pace to the Journey simulator (reactive provider),
+    // then switch to the Journey tab pre-set to that rate.
+    void openJourney(double rate) {
+      ref.read(journeyRateProvider.notifier).set(rate);
       context.pop();
       ref.read(homeTabProvider.notifier).state = 2;
     }
@@ -46,9 +49,10 @@ class EnergyIntakeScreen extends ConsumerWidget {
             color: VitaColors.good,
             rows: [
               for (final r in _loseRows)
-                _RateData(r.$2, r.$3, result.loseTargets[r.$1]!, result.loseTargets[r.$1]! / maint),
+                _RateData(r.$2, r.$3, result.loseTargets[r.$1]!, result.loseTargets[r.$1]! / maint,
+                    double.parse(r.$1.split('_').last)),
             ],
-            onTapRow: (_) => openJourney(),
+            onTapRow: (rd) => openJourney(rd.rate),
           ),
           const SizedBox(height: 14),
           _EnergyCard(
@@ -56,9 +60,10 @@ class EnergyIntakeScreen extends ConsumerWidget {
             color: VitaColors.ember,
             rows: [
               for (final r in _gainRows)
-                _RateData(r.$2, r.$3, result.gainTargets[r.$1]!, result.gainTargets[r.$1]! / maint),
+                _RateData(r.$2, r.$3, result.gainTargets[r.$1]!, result.gainTargets[r.$1]! / maint,
+                    double.parse(r.$1.split('_').last)),
             ],
-            onTapRow: (_) => openJourney(),
+            onTapRow: (rd) => openJourney(rd.rate),
           ),
           const SizedBox(height: 16),
           Center(
@@ -72,11 +77,12 @@ class EnergyIntakeScreen extends ConsumerWidget {
 }
 
 class _RateData {
-  const _RateData(this.title, this.sub, this.kcal, this.pct);
+  const _RateData(this.title, this.sub, this.kcal, this.pct, this.rate);
   final String title;
   final String sub;
   final double kcal;
   final double pct;
+  final double rate; // kg/week
 }
 
 class _EnergyCard extends StatelessWidget {

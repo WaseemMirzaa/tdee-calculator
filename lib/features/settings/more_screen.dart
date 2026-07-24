@@ -50,7 +50,7 @@ class MoreScreen extends ConsumerWidget {
                     Text(profile?.name?.isNotEmpty == true ? profile!.name! : 'Your profile',
                         style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: v.ink)),
                     if (profile != null)
-                      Text('${profile.age} yr · ${profile.weightKg.toStringAsFixed(0)} kg · ${profile.heightCm.toStringAsFixed(0)} cm',
+                      Text('${profile.age} yr · ${_weightStr(profile.weightKg, unit)} · ${_heightStr(profile.heightCm, unit)}',
                           style: TextStyle(color: v.muted, fontSize: 12.5)),
                   ],
                 ),
@@ -111,6 +111,15 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 
+  String _weightStr(double kg, UnitSystem unit) =>
+      '${Units.displayWeight(kg, unit).toStringAsFixed(0)} ${Units.weightUnit(unit)}';
+
+  String _heightStr(double cm, UnitSystem unit) {
+    if (unit == UnitSystem.metric) return '${cm.toStringAsFixed(0)} cm';
+    final (ft, inch) = Units.cmToFeetInches(cm);
+    return "$ft'$inch\"";
+  }
+
   void _todo(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Wire this to your store / support URL before release.')),
@@ -143,6 +152,10 @@ class MoreScreen extends ConsumerWidget {
       ref.invalidate(foodPrefsProvider);
       ref.invalidate(weighInsProvider);
       ref.invalidate(kitchenProvider);
+      ref.invalidate(servingsProvider);
+      ref.invalidate(selectedDayProvider);
+      ref.invalidate(journeyTargetProvider);
+      ref.invalidate(journeyRateProvider);
       NotificationService.instance.cancelRestockReminder();
       ref.read(selectedDietProvider.notifier).select('anything');
       if (context.mounted) context.go(Routes.welcome);
