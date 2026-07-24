@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../db/app_database.dart';
+import '../models/meal.dart';
 import '../models/seed_data.dart';
 import '../models/weigh_in.dart';
 import '../meal_planner.dart';
 import '../seed_loader.dart';
+import '../services/purchase_service.dart';
 import '../tdee_engine.dart';
 import '../util/units.dart';
 
@@ -76,6 +78,14 @@ class PremiumNotifier extends Notifier<bool> {
 }
 
 final premiumProvider = NotifierProvider<PremiumNotifier, bool>(PremiumNotifier.new);
+
+/// The store billing wrapper. Initialised in `main()`; grants entitlement to
+/// [premiumProvider] when a purchase or restore completes.
+final purchaseServiceProvider = Provider<PurchaseService>((ref) {
+  final service = PurchaseService();
+  ref.onDispose(service.dispose);
+  return service;
+});
 
 // ---------------------------------------------------------------------------
 // Unit system  (kg/cm ↔ lb/ft)  &  theme mode  — persisted preferences
