@@ -1,0 +1,48 @@
+name: vita_tdee
+description: "Vita — a TDEE / calorie calculator and meal-planning app."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Routing
+  go_router: ^14.2.7
+
+  # Local SQL database (sqflite + raw SQL, no codegen)
+  sqflite: ^2.3.3+1
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+  # Charts (Journey trend + projections)
+  fl_chart: ^0.69.0
+
+  # Billing (trial + auto-renew) — Google Play Billing / StoreKit
+  in_app_purchase: ^3.2.0
+
+  # Ads for the free tier
+  google_mobile_ads: ^5.1.0
+
+  # Misc
+  intl: ^0.19.0
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  test: ^1.25.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/tdee_seed.json

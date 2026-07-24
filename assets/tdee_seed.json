@@ -1,0 +1,2744 @@
+{
+  "version": 1,
+  "meta": {
+    "description": "TDEE Calculator seed database \u2014 foods, meals, diets, sample plan",
+    "macroBasis": "per 100 g edible portion (meats/grains cooked, produce raw)",
+    "source": "USDA-standard seed values; reconcile with a nutrition API before content-lock",
+    "dietLegend": {
+      "k": "keto",
+      "ve": "vegetarian",
+      "vg": "vegan",
+      "pa": "paleo",
+      "me": "mediterranean"
+    }
+  },
+  "diets": [
+    {
+      "id": "anything",
+      "name": "Anything",
+      "singleSelect": true,
+      "excludes": []
+    },
+    {
+      "id": "keto",
+      "name": "Keto",
+      "singleSelect": true,
+      "excludes": [
+        "grains",
+        "legumes",
+        "starchy_vegetables",
+        "most_fruit",
+        "sugar"
+      ]
+    },
+    {
+      "id": "vegetarian",
+      "name": "Vegetarian",
+      "singleSelect": true,
+      "excludes": [
+        "red_meat",
+        "poultry",
+        "fish",
+        "seafood"
+      ]
+    },
+    {
+      "id": "vegan",
+      "name": "Vegan",
+      "singleSelect": true,
+      "excludes": [
+        "red_meat",
+        "poultry",
+        "fish",
+        "seafood",
+        "dairy",
+        "eggs",
+        "honey"
+      ]
+    },
+    {
+      "id": "paleo",
+      "name": "Paleo",
+      "singleSelect": true,
+      "excludes": [
+        "grains",
+        "legumes",
+        "dairy",
+        "refined_sugar"
+      ]
+    },
+    {
+      "id": "mediterranean",
+      "name": "Mediterranean",
+      "singleSelect": true,
+      "excludes": [
+        "red_meat",
+        "fruit_juice",
+        "refined_sugar"
+      ]
+    }
+  ],
+  "foods": [
+    {
+      "id": "protein_chicken_breast",
+      "name": "Chicken breast",
+      "category": "protein",
+      "kcalPer100g": 165,
+      "protein": 31,
+      "carbs": 0,
+      "fat": 3.6,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_turkey",
+      "name": "Turkey",
+      "category": "protein",
+      "kcalPer100g": 189,
+      "protein": 29,
+      "carbs": 0,
+      "fat": 7,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_beef_lean",
+      "name": "Beef (lean)",
+      "category": "protein",
+      "kcalPer100g": 217,
+      "protein": 26,
+      "carbs": 0,
+      "fat": 12,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "protein_lamb",
+      "name": "Lamb / Mutton",
+      "category": "protein",
+      "kcalPer100g": 258,
+      "protein": 25,
+      "carbs": 0,
+      "fat": 17,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "protein_pork_lean",
+      "name": "Pork (lean)",
+      "category": "protein",
+      "kcalPer100g": 242,
+      "protein": 27,
+      "carbs": 0,
+      "fat": 14,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "protein_ham",
+      "name": "Ham",
+      "category": "protein",
+      "kcalPer100g": 145,
+      "protein": 21,
+      "carbs": 1.5,
+      "fat": 5,
+      "diets": [
+        "anything",
+        "keto"
+      ]
+    },
+    {
+      "id": "protein_salmon",
+      "name": "Salmon",
+      "category": "protein",
+      "kcalPer100g": 208,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 13,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_white_fish",
+      "name": "White fish (cod)",
+      "category": "protein",
+      "kcalPer100g": 105,
+      "protein": 23,
+      "carbs": 0,
+      "fat": 0.9,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_tuna",
+      "name": "Tuna (canned, water)",
+      "category": "protein",
+      "kcalPer100g": 116,
+      "protein": 26,
+      "carbs": 0,
+      "fat": 1,
+      "diets": [
+        "anything",
+        "keto",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_egg_whole",
+      "name": "Egg (whole)",
+      "category": "protein",
+      "kcalPer100g": 155,
+      "protein": 13,
+      "carbs": 1.1,
+      "fat": 11,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_egg_white",
+      "name": "Egg white",
+      "category": "protein",
+      "kcalPer100g": 52,
+      "protein": 11,
+      "carbs": 0.7,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_tofu",
+      "name": "Tofu",
+      "category": "protein",
+      "kcalPer100g": 76,
+      "protein": 8,
+      "carbs": 1.9,
+      "fat": 4.8,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_edamame",
+      "name": "Edamame / Soybeans",
+      "category": "protein",
+      "kcalPer100g": 172,
+      "protein": 18,
+      "carbs": 10,
+      "fat": 9,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_tempeh",
+      "name": "Tempeh",
+      "category": "protein",
+      "kcalPer100g": 192,
+      "protein": 20,
+      "carbs": 7.6,
+      "fat": 11,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_seitan",
+      "name": "Seitan",
+      "category": "protein",
+      "kcalPer100g": 370,
+      "protein": 75,
+      "carbs": 14,
+      "fat": 1.9,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "protein_whey",
+      "name": "Whey protein",
+      "category": "protein",
+      "kcalPer100g": 400,
+      "protein": 80,
+      "carbs": 8,
+      "fat": 6,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian"
+      ]
+    },
+    {
+      "id": "carb_white_rice",
+      "name": "White rice",
+      "category": "carbs",
+      "kcalPer100g": 130,
+      "protein": 2.7,
+      "carbs": 28,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_oats",
+      "name": "Oats",
+      "category": "carbs",
+      "kcalPer100g": 71,
+      "protein": 2.5,
+      "carbs": 12,
+      "fat": 1.5,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_bread_ww",
+      "name": "Whole-wheat bread",
+      "category": "carbs",
+      "kcalPer100g": 247,
+      "protein": 13,
+      "carbs": 41,
+      "fat": 3.4,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_pasta",
+      "name": "Pasta",
+      "category": "carbs",
+      "kcalPer100g": 158,
+      "protein": 5.8,
+      "carbs": 31,
+      "fat": 0.9,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_quinoa",
+      "name": "Quinoa",
+      "category": "carbs",
+      "kcalPer100g": 120,
+      "protein": 4.4,
+      "carbs": 21,
+      "fat": 1.9,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_tortilla",
+      "name": "Tortilla (flour)",
+      "category": "carbs",
+      "kcalPer100g": 310,
+      "protein": 8,
+      "carbs": 51,
+      "fat": 8,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_cereal",
+      "name": "Cereal",
+      "category": "carbs",
+      "kcalPer100g": 380,
+      "protein": 8,
+      "carbs": 84,
+      "fat": 3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_potato",
+      "name": "Potato (boiled)",
+      "category": "carbs",
+      "kcalPer100g": 87,
+      "protein": 1.9,
+      "carbs": 20,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan"
+      ]
+    },
+    {
+      "id": "carb_sweet_potato",
+      "name": "Sweet potato",
+      "category": "carbs",
+      "kcalPer100g": 90,
+      "protein": 2,
+      "carbs": 21,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo"
+      ]
+    },
+    {
+      "id": "carb_butternut",
+      "name": "Butternut squash",
+      "category": "carbs",
+      "kcalPer100g": 40,
+      "protein": 0.9,
+      "carbs": 10,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo"
+      ]
+    },
+    {
+      "id": "carb_cassava",
+      "name": "Cassava",
+      "category": "carbs",
+      "kcalPer100g": 191,
+      "protein": 1.4,
+      "carbs": 38,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan"
+      ]
+    },
+    {
+      "id": "carb_lentils",
+      "name": "Lentils",
+      "category": "carbs",
+      "kcalPer100g": 116,
+      "protein": 9,
+      "carbs": 20,
+      "fat": 0.4,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_chickpeas",
+      "name": "Chickpeas",
+      "category": "carbs",
+      "kcalPer100g": 164,
+      "protein": 8.9,
+      "carbs": 27,
+      "fat": 2.6,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_black_beans",
+      "name": "Black beans",
+      "category": "carbs",
+      "kcalPer100g": 132,
+      "protein": 8.9,
+      "carbs": 24,
+      "fat": 0.5,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_green_peas",
+      "name": "Green peas",
+      "category": "carbs",
+      "kcalPer100g": 84,
+      "protein": 5.4,
+      "carbs": 16,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_corn",
+      "name": "Corn",
+      "category": "carbs",
+      "kcalPer100g": 96,
+      "protein": 3.4,
+      "carbs": 21,
+      "fat": 1.5,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_popcorn",
+      "name": "Popcorn (air-popped)",
+      "category": "carbs",
+      "kcalPer100g": 387,
+      "protein": 13,
+      "carbs": 78,
+      "fat": 4.5,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "carb_green_beans",
+      "name": "Green beans",
+      "category": "carbs",
+      "kcalPer100g": 35,
+      "protein": 1.9,
+      "carbs": 7.9,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_olive_oil",
+      "name": "Olive oil",
+      "category": "fat",
+      "kcalPer100g": 884,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 100,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_coconut_oil",
+      "name": "Coconut oil",
+      "category": "fat",
+      "kcalPer100g": 862,
+      "protein": 0,
+      "carbs": 0,
+      "fat": 100,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_avocado",
+      "name": "Avocado",
+      "category": "fat",
+      "kcalPer100g": 160,
+      "protein": 2,
+      "carbs": 9,
+      "fat": 15,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_almonds",
+      "name": "Almonds",
+      "category": "fat",
+      "kcalPer100g": 579,
+      "protein": 21,
+      "carbs": 22,
+      "fat": 50,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_walnuts",
+      "name": "Walnuts",
+      "category": "fat",
+      "kcalPer100g": 654,
+      "protein": 15,
+      "carbs": 14,
+      "fat": 65,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_pecans",
+      "name": "Pecans",
+      "category": "fat",
+      "kcalPer100g": 691,
+      "protein": 9,
+      "carbs": 14,
+      "fat": 72,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_cashews",
+      "name": "Cashews",
+      "category": "fat",
+      "kcalPer100g": 553,
+      "protein": 18,
+      "carbs": 30,
+      "fat": 44,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_peanuts",
+      "name": "Peanuts",
+      "category": "fat",
+      "kcalPer100g": 567,
+      "protein": 26,
+      "carbs": 16,
+      "fat": 49,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_chia",
+      "name": "Chia seeds",
+      "category": "fat",
+      "kcalPer100g": 486,
+      "protein": 17,
+      "carbs": 42,
+      "fat": 31,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_olives",
+      "name": "Olives",
+      "category": "fat",
+      "kcalPer100g": 115,
+      "protein": 0.8,
+      "carbs": 6,
+      "fat": 11,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_coconut",
+      "name": "Coconut (meat)",
+      "category": "fat",
+      "kcalPer100g": 354,
+      "protein": 3.3,
+      "carbs": 15,
+      "fat": 33,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fat_dark_choc",
+      "name": "Dark chocolate (85%)",
+      "category": "fat",
+      "kcalPer100g": 598,
+      "protein": 7.8,
+      "carbs": 46,
+      "fat": 43,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_strawberry",
+      "name": "Strawberry",
+      "category": "fruits",
+      "kcalPer100g": 32,
+      "protein": 0.7,
+      "carbs": 7.7,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_raspberries",
+      "name": "Raspberries",
+      "category": "fruits",
+      "kcalPer100g": 52,
+      "protein": 1.2,
+      "carbs": 12,
+      "fat": 0.7,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_blackberries",
+      "name": "Blackberries",
+      "category": "fruits",
+      "kcalPer100g": 43,
+      "protein": 1.4,
+      "carbs": 10,
+      "fat": 0.5,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_blueberries",
+      "name": "Blueberries",
+      "category": "fruits",
+      "kcalPer100g": 57,
+      "protein": 0.7,
+      "carbs": 14,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_apple",
+      "name": "Apple",
+      "category": "fruits",
+      "kcalPer100g": 52,
+      "protein": 0.3,
+      "carbs": 14,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_banana",
+      "name": "Banana",
+      "category": "fruits",
+      "kcalPer100g": 89,
+      "protein": 1.1,
+      "carbs": 23,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_orange",
+      "name": "Orange",
+      "category": "fruits",
+      "kcalPer100g": 47,
+      "protein": 0.9,
+      "carbs": 12,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_grapes",
+      "name": "Grapes",
+      "category": "fruits",
+      "kcalPer100g": 69,
+      "protein": 0.7,
+      "carbs": 18,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_watermelon",
+      "name": "Watermelon",
+      "category": "fruits",
+      "kcalPer100g": 30,
+      "protein": 0.6,
+      "carbs": 8,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_mango",
+      "name": "Mango",
+      "category": "fruits",
+      "kcalPer100g": 60,
+      "protein": 0.8,
+      "carbs": 15,
+      "fat": 0.4,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_pineapple",
+      "name": "Pineapple",
+      "category": "fruits",
+      "kcalPer100g": 50,
+      "protein": 0.5,
+      "carbs": 13,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_kiwi",
+      "name": "Kiwi",
+      "category": "fruits",
+      "kcalPer100g": 61,
+      "protein": 1.1,
+      "carbs": 15,
+      "fat": 0.5,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_peach",
+      "name": "Peach",
+      "category": "fruits",
+      "kcalPer100g": 39,
+      "protein": 0.9,
+      "carbs": 10,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_pear",
+      "name": "Pear",
+      "category": "fruits",
+      "kcalPer100g": 57,
+      "protein": 0.4,
+      "carbs": 15,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_papaya",
+      "name": "Papaya",
+      "category": "fruits",
+      "kcalPer100g": 43,
+      "protein": 0.5,
+      "carbs": 11,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_cantaloupe",
+      "name": "Cantaloupe",
+      "category": "fruits",
+      "kcalPer100g": 34,
+      "protein": 0.8,
+      "carbs": 8,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_cherries",
+      "name": "Cherries",
+      "category": "fruits",
+      "kcalPer100g": 63,
+      "protein": 1.1,
+      "carbs": 16,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_figs",
+      "name": "Figs",
+      "category": "fruits",
+      "kcalPer100g": 74,
+      "protein": 0.8,
+      "carbs": 19,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_dragon_fruit",
+      "name": "Dragon fruit",
+      "category": "fruits",
+      "kcalPer100g": 60,
+      "protein": 1.2,
+      "carbs": 13,
+      "fat": 0,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "fruit_dates",
+      "name": "Dates",
+      "category": "fruits",
+      "kcalPer100g": 277,
+      "protein": 1.8,
+      "carbs": 75,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_spinach",
+      "name": "Spinach",
+      "category": "vegetables",
+      "kcalPer100g": 23,
+      "protein": 2.9,
+      "carbs": 3.6,
+      "fat": 0.4,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_broccoli",
+      "name": "Broccoli",
+      "category": "vegetables",
+      "kcalPer100g": 34,
+      "protein": 2.8,
+      "carbs": 7,
+      "fat": 0.4,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_cauliflower",
+      "name": "Cauliflower",
+      "category": "vegetables",
+      "kcalPer100g": 25,
+      "protein": 1.9,
+      "carbs": 5,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_tomato",
+      "name": "Tomato",
+      "category": "vegetables",
+      "kcalPer100g": 18,
+      "protein": 0.9,
+      "carbs": 3.9,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_cucumber",
+      "name": "Cucumber",
+      "category": "vegetables",
+      "kcalPer100g": 15,
+      "protein": 0.7,
+      "carbs": 3.6,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_cabbage",
+      "name": "Cabbage",
+      "category": "vegetables",
+      "kcalPer100g": 25,
+      "protein": 1.3,
+      "carbs": 6,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_bell_pepper",
+      "name": "Bell pepper",
+      "category": "vegetables",
+      "kcalPer100g": 31,
+      "protein": 1,
+      "carbs": 6,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_zucchini",
+      "name": "Zucchini",
+      "category": "vegetables",
+      "kcalPer100g": 17,
+      "protein": 1.2,
+      "carbs": 3.1,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_mushroom",
+      "name": "Mushroom",
+      "category": "vegetables",
+      "kcalPer100g": 22,
+      "protein": 3.1,
+      "carbs": 3.3,
+      "fat": 0.3,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_lettuce",
+      "name": "Lettuce",
+      "category": "vegetables",
+      "kcalPer100g": 15,
+      "protein": 1.4,
+      "carbs": 2.9,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_eggplant",
+      "name": "Eggplant",
+      "category": "vegetables",
+      "kcalPer100g": 25,
+      "protein": 1,
+      "carbs": 6,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_asparagus",
+      "name": "Asparagus",
+      "category": "vegetables",
+      "kcalPer100g": 20,
+      "protein": 2.2,
+      "carbs": 3.9,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_celery",
+      "name": "Celery",
+      "category": "vegetables",
+      "kcalPer100g": 16,
+      "protein": 0.7,
+      "carbs": 3,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_turnip",
+      "name": "Turnip",
+      "category": "vegetables",
+      "kcalPer100g": 28,
+      "protein": 0.9,
+      "carbs": 6,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_radish",
+      "name": "Radish",
+      "category": "vegetables",
+      "kcalPer100g": 16,
+      "protein": 0.7,
+      "carbs": 3.4,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_onion",
+      "name": "Onion",
+      "category": "vegetables",
+      "kcalPer100g": 40,
+      "protein": 1.1,
+      "carbs": 9,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_carrot",
+      "name": "Carrot",
+      "category": "vegetables",
+      "kcalPer100g": 41,
+      "protein": 0.9,
+      "carbs": 10,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_beet",
+      "name": "Beet",
+      "category": "vegetables",
+      "kcalPer100g": 43,
+      "protein": 1.6,
+      "carbs": 10,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_pumpkin",
+      "name": "Pumpkin",
+      "category": "vegetables",
+      "kcalPer100g": 26,
+      "protein": 1,
+      "carbs": 7,
+      "fat": 0.1,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "veg_garlic",
+      "name": "Garlic",
+      "category": "vegetables",
+      "kcalPer100g": 149,
+      "protein": 6.4,
+      "carbs": 33,
+      "fat": 0.5,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_milk_whole",
+      "name": "Milk (whole)",
+      "category": "dairy",
+      "kcalPer100g": 61,
+      "protein": 3.2,
+      "carbs": 4.8,
+      "fat": 3.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_greek_yogurt",
+      "name": "Greek yogurt (plain)",
+      "category": "dairy",
+      "kcalPer100g": 59,
+      "protein": 10,
+      "carbs": 3.6,
+      "fat": 0.4,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_yogurt",
+      "name": "Yogurt (plain)",
+      "category": "dairy",
+      "kcalPer100g": 61,
+      "protein": 3.5,
+      "carbs": 4.7,
+      "fat": 3.3,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_cheddar",
+      "name": "Cheddar cheese",
+      "category": "dairy",
+      "kcalPer100g": 403,
+      "protein": 25,
+      "carbs": 1.3,
+      "fat": 33,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_feta",
+      "name": "Feta / white cheese",
+      "category": "dairy",
+      "kcalPer100g": 264,
+      "protein": 14,
+      "carbs": 4,
+      "fat": 21,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_cottage_cheese",
+      "name": "Cottage cheese",
+      "category": "dairy",
+      "kcalPer100g": 98,
+      "protein": 11,
+      "carbs": 3.4,
+      "fat": 4.3,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_almond_milk",
+      "name": "Almond milk (unsweetened)",
+      "category": "dairy",
+      "kcalPer100g": 15,
+      "protein": 0.6,
+      "carbs": 0.6,
+      "fat": 1.2,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_soy_milk",
+      "name": "Soy milk",
+      "category": "dairy",
+      "kcalPer100g": 33,
+      "protein": 3.3,
+      "carbs": 1.8,
+      "fat": 1.6,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_coconut_milk",
+      "name": "Coconut milk (drink)",
+      "category": "dairy",
+      "kcalPer100g": 20,
+      "protein": 0.2,
+      "carbs": 1,
+      "fat": 1.9,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_oat_milk",
+      "name": "Oat milk",
+      "category": "dairy",
+      "kcalPer100g": 47,
+      "protein": 1,
+      "carbs": 7,
+      "fat": 1.5,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_coconut_water",
+      "name": "Coconut water",
+      "category": "dairy",
+      "kcalPer100g": 19,
+      "protein": 0.7,
+      "carbs": 3.7,
+      "fat": 0.2,
+      "diets": [
+        "anything",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_black_coffee",
+      "name": "Black coffee",
+      "category": "dairy",
+      "kcalPer100g": 1,
+      "protein": 0.1,
+      "carbs": 0,
+      "fat": 0,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    },
+    {
+      "id": "dairy_herbal_tea",
+      "name": "Herbal tea",
+      "category": "dairy",
+      "kcalPer100g": 1,
+      "protein": 0,
+      "carbs": 0.2,
+      "fat": 0,
+      "diets": [
+        "anything",
+        "keto",
+        "vegetarian",
+        "vegan",
+        "paleo",
+        "mediterranean"
+      ]
+    }
+  ],
+  "meals": [
+    {
+      "id": "meal_keto_spinach_omelette",
+      "title": "Keto Spinach & Cheese Omelette",
+      "type": "breakfast",
+      "diets": [
+        "keto",
+        "vegetarian",
+        "anything"
+      ],
+      "timeMinutes": 10,
+      "calories": 489,
+      "protein": 28,
+      "carbs": 4,
+      "fat": 41,
+      "ingredients": [
+        {
+          "foodId": "protein_egg_whole",
+          "name": "Egg (whole)",
+          "amount": "3 large",
+          "grams": 150,
+          "kcal": 232
+        },
+        {
+          "foodId": "veg_spinach",
+          "name": "Spinach",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 12
+        },
+        {
+          "foodId": "dairy_cheddar",
+          "name": "Cheddar cheese",
+          "amount": "30 g",
+          "grams": 30,
+          "kcal": 121
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "1 tbsp",
+          "grams": 14,
+          "kcal": 124
+        },
+        {
+          "name": "Salt",
+          "amount": "to taste",
+          "kcal": 0
+        },
+        {
+          "name": "Black pepper",
+          "amount": "to taste",
+          "kcal": 0
+        }
+      ],
+      "steps": [
+        "Heat the olive oil in a non-stick pan over low heat.",
+        "Whisk the eggs with salt and pepper.",
+        "Pour in the eggs and let them set gently.",
+        "Add spinach and cheddar to one half.",
+        "Fold and cook until the cheese melts."
+      ]
+    },
+    {
+      "id": "meal_tofu_scramble",
+      "title": "Veggie Tofu Scramble",
+      "type": "breakfast",
+      "diets": [
+        "vegan",
+        "vegetarian",
+        "keto",
+        "anything"
+      ],
+      "timeMinutes": 12,
+      "calories": 239,
+      "protein": 14,
+      "carbs": 10,
+      "fat": 18,
+      "ingredients": [
+        {
+          "foodId": "protein_tofu",
+          "name": "Tofu",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 114
+        },
+        {
+          "foodId": "veg_spinach",
+          "name": "Spinach",
+          "amount": "40 g",
+          "grams": 40,
+          "kcal": 9
+        },
+        {
+          "foodId": "veg_bell_pepper",
+          "name": "Bell pepper",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 16
+        },
+        {
+          "foodId": "veg_onion",
+          "name": "Onion",
+          "amount": "30 g",
+          "grams": 30,
+          "kcal": 12
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "2 tsp",
+          "grams": 10,
+          "kcal": 88
+        },
+        {
+          "name": "Turmeric",
+          "amount": "to taste",
+          "kcal": 0
+        },
+        {
+          "name": "Salt",
+          "amount": "to taste",
+          "kcal": 0
+        }
+      ],
+      "steps": [
+        "Crumble the tofu with a fork.",
+        "Saute onion and pepper in olive oil until soft.",
+        "Add tofu and turmeric; cook 4-5 minutes.",
+        "Fold in spinach until wilted; season."
+      ]
+    },
+    {
+      "id": "meal_greek_yogurt_bowl",
+      "title": "Greek Yogurt & Berry Bowl",
+      "type": "breakfast",
+      "diets": [
+        "vegetarian",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 5,
+      "calories": 311,
+      "protein": 26,
+      "carbs": 23,
+      "fat": 14,
+      "ingredients": [
+        {
+          "foodId": "dairy_greek_yogurt",
+          "name": "Greek yogurt (plain)",
+          "amount": "200 g",
+          "grams": 200,
+          "kcal": 118
+        },
+        {
+          "foodId": "fruit_blueberries",
+          "name": "Blueberries",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 28
+        },
+        {
+          "foodId": "fat_almonds",
+          "name": "Almonds",
+          "amount": "20 g",
+          "grams": 20,
+          "kcal": 116
+        },
+        {
+          "foodId": "fat_chia",
+          "name": "Chia seeds",
+          "amount": "10 g",
+          "grams": 10,
+          "kcal": 49
+        }
+      ],
+      "steps": [
+        "Spoon the yogurt into a bowl.",
+        "Top with blueberries, almonds and chia seeds."
+      ]
+    },
+    {
+      "id": "meal_banana_oatmeal",
+      "title": "Banana Walnut Oatmeal",
+      "type": "breakfast",
+      "diets": [
+        "vegan",
+        "vegetarian",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 10,
+      "calories": 377,
+      "protein": 10,
+      "carbs": 50,
+      "fat": 18,
+      "ingredients": [
+        {
+          "foodId": "carb_oats",
+          "name": "Oats",
+          "amount": "1 cup cooked",
+          "grams": 200,
+          "kcal": 142
+        },
+        {
+          "foodId": "fruit_banana",
+          "name": "Banana",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 89
+        },
+        {
+          "foodId": "fat_walnuts",
+          "name": "Walnuts",
+          "amount": "20 g",
+          "grams": 20,
+          "kcal": 131
+        },
+        {
+          "foodId": "dairy_almond_milk",
+          "name": "Almond milk (unsweetened)",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 15
+        }
+      ],
+      "steps": [
+        "Warm the cooked oats with almond milk.",
+        "Top with sliced banana and walnuts."
+      ]
+    },
+    {
+      "id": "meal_grilled_chicken_salad",
+      "title": "Grilled Chicken Salad",
+      "type": "lunch",
+      "diets": [
+        "keto",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 15,
+      "calories": 476,
+      "protein": 52,
+      "carbs": 7,
+      "fat": 26,
+      "ingredients": [
+        {
+          "foodId": "protein_chicken_breast",
+          "name": "Chicken breast",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 248
+        },
+        {
+          "foodId": "veg_lettuce",
+          "name": "Lettuce",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 9
+        },
+        {
+          "foodId": "veg_tomato",
+          "name": "Tomato",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 9
+        },
+        {
+          "foodId": "veg_cucumber",
+          "name": "Cucumber",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 8
+        },
+        {
+          "foodId": "dairy_feta",
+          "name": "Feta / white cheese",
+          "amount": "30 g",
+          "grams": 30,
+          "kcal": 79
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "1 tbsp",
+          "grams": 14,
+          "kcal": 124
+        }
+      ],
+      "steps": [
+        "Grill the chicken and slice it.",
+        "Toss lettuce, tomato and cucumber with olive oil.",
+        "Top with chicken and crumbled feta."
+      ]
+    },
+    {
+      "id": "meal_salmon_greens",
+      "title": "Baked Salmon & Greens",
+      "type": "dinner",
+      "diets": [
+        "keto",
+        "paleo",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 20,
+      "calories": 535,
+      "protein": 39,
+      "carbs": 12,
+      "fat": 37,
+      "ingredients": [
+        {
+          "foodId": "protein_salmon",
+          "name": "Salmon",
+          "amount": "170 g",
+          "grams": 170,
+          "kcal": 354
+        },
+        {
+          "foodId": "veg_broccoli",
+          "name": "Broccoli",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 34
+        },
+        {
+          "foodId": "veg_asparagus",
+          "name": "Asparagus",
+          "amount": "80 g",
+          "grams": 80,
+          "kcal": 16
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "1 tbsp",
+          "grams": 14,
+          "kcal": 124
+        },
+        {
+          "foodId": "veg_garlic",
+          "name": "Garlic",
+          "amount": "5 g",
+          "grams": 5,
+          "kcal": 7
+        },
+        {
+          "name": "Lemon",
+          "amount": "1 wedge",
+          "kcal": 0
+        }
+      ],
+      "steps": [
+        "Heat the oven to 200 C.",
+        "Toss vegetables with olive oil and garlic.",
+        "Roast salmon and vegetables 15 minutes.",
+        "Finish with a squeeze of lemon."
+      ]
+    },
+    {
+      "id": "meal_chicken_rice_bowl",
+      "title": "Chicken & Rice Power Bowl",
+      "type": "lunch",
+      "diets": [
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 20,
+      "calories": 558,
+      "protein": 53,
+      "carbs": 48,
+      "fat": 16,
+      "ingredients": [
+        {
+          "foodId": "protein_chicken_breast",
+          "name": "Chicken breast",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 248
+        },
+        {
+          "foodId": "carb_white_rice",
+          "name": "White rice",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 195
+        },
+        {
+          "foodId": "veg_broccoli",
+          "name": "Broccoli",
+          "amount": "80 g",
+          "grams": 80,
+          "kcal": 27
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "2 tsp",
+          "grams": 10,
+          "kcal": 88
+        }
+      ],
+      "steps": [
+        "Cook the rice.",
+        "Grill and slice the chicken.",
+        "Steam the broccoli.",
+        "Assemble the bowl and drizzle with olive oil."
+      ]
+    },
+    {
+      "id": "meal_beef_stirfry",
+      "title": "Beef & Veggie Stir-Fry",
+      "type": "dinner",
+      "diets": [
+        "keto",
+        "paleo",
+        "anything"
+      ],
+      "timeMinutes": 20,
+      "calories": 494,
+      "protein": 42,
+      "carbs": 14,
+      "fat": 31,
+      "ingredients": [
+        {
+          "foodId": "protein_beef_lean",
+          "name": "Beef (lean)",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 326
+        },
+        {
+          "foodId": "veg_bell_pepper",
+          "name": "Bell pepper",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 19
+        },
+        {
+          "foodId": "veg_broccoli",
+          "name": "Broccoli",
+          "amount": "80 g",
+          "grams": 80,
+          "kcal": 27
+        },
+        {
+          "foodId": "veg_onion",
+          "name": "Onion",
+          "amount": "30 g",
+          "grams": 30,
+          "kcal": 12
+        },
+        {
+          "foodId": "fat_coconut_oil",
+          "name": "Coconut oil",
+          "amount": "1 tbsp",
+          "grams": 12,
+          "kcal": 103
+        },
+        {
+          "foodId": "veg_garlic",
+          "name": "Garlic",
+          "amount": "5 g",
+          "grams": 5,
+          "kcal": 7
+        }
+      ],
+      "steps": [
+        "Heat coconut oil in a wok on high.",
+        "Sear the beef strips; set aside.",
+        "Stir-fry vegetables and garlic 3-4 minutes.",
+        "Return beef and toss to combine."
+      ]
+    },
+    {
+      "id": "meal_lentil_soup",
+      "title": "Hearty Lentil Soup",
+      "type": "lunch",
+      "diets": [
+        "vegan",
+        "vegetarian",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 30,
+      "calories": 379,
+      "protein": 20,
+      "carbs": 54,
+      "fat": 11,
+      "ingredients": [
+        {
+          "foodId": "carb_lentils",
+          "name": "Lentils",
+          "amount": "200 g",
+          "grams": 200,
+          "kcal": 232
+        },
+        {
+          "foodId": "veg_carrot",
+          "name": "Carrot",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 25
+        },
+        {
+          "foodId": "veg_onion",
+          "name": "Onion",
+          "amount": "40 g",
+          "grams": 40,
+          "kcal": 16
+        },
+        {
+          "foodId": "veg_tomato",
+          "name": "Tomato",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 11
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "2 tsp",
+          "grams": 10,
+          "kcal": 88
+        },
+        {
+          "foodId": "veg_garlic",
+          "name": "Garlic",
+          "amount": "5 g",
+          "grams": 5,
+          "kcal": 7
+        },
+        {
+          "name": "Cumin",
+          "amount": "to taste",
+          "kcal": 0
+        }
+      ],
+      "steps": [
+        "Saute onion, carrot and garlic in olive oil.",
+        "Add lentils, tomato, cumin and water.",
+        "Simmer 20-25 minutes until tender."
+      ]
+    },
+    {
+      "id": "meal_chickpea_curry",
+      "title": "Chickpea Curry",
+      "type": "dinner",
+      "diets": [
+        "vegan",
+        "vegetarian",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 25,
+      "calories": 482,
+      "protein": 20,
+      "carbs": 65,
+      "fat": 17,
+      "ingredients": [
+        {
+          "foodId": "carb_chickpeas",
+          "name": "Chickpeas",
+          "amount": "200 g",
+          "grams": 200,
+          "kcal": 328
+        },
+        {
+          "foodId": "veg_tomato",
+          "name": "Tomato",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 18
+        },
+        {
+          "foodId": "veg_onion",
+          "name": "Onion",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 20
+        },
+        {
+          "foodId": "dairy_coconut_milk",
+          "name": "Coconut milk (drink)",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 20
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "2 tsp",
+          "grams": 10,
+          "kcal": 88
+        },
+        {
+          "foodId": "veg_garlic",
+          "name": "Garlic",
+          "amount": "5 g",
+          "grams": 5,
+          "kcal": 7
+        },
+        {
+          "name": "Curry spices",
+          "amount": "to taste",
+          "kcal": 0
+        }
+      ],
+      "steps": [
+        "Saute onion and garlic in olive oil.",
+        "Add tomato and spices; cook down.",
+        "Stir in chickpeas and coconut milk.",
+        "Simmer 12-15 minutes."
+      ]
+    },
+    {
+      "id": "meal_quinoa_salad",
+      "title": "Mediterranean Quinoa Salad",
+      "type": "lunch",
+      "diets": [
+        "vegan",
+        "vegetarian",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 15,
+      "calories": 337,
+      "protein": 8,
+      "carbs": 37,
+      "fat": 18,
+      "ingredients": [
+        {
+          "foodId": "carb_quinoa",
+          "name": "Quinoa",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 180
+        },
+        {
+          "foodId": "veg_cucumber",
+          "name": "Cucumber",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 8
+        },
+        {
+          "foodId": "veg_tomato",
+          "name": "Tomato",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 9
+        },
+        {
+          "foodId": "fat_olives",
+          "name": "Olives",
+          "amount": "30 g",
+          "grams": 30,
+          "kcal": 34
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "1 tbsp",
+          "grams": 12,
+          "kcal": 106
+        }
+      ],
+      "steps": [
+        "Cook and cool the quinoa.",
+        "Dice cucumber and tomato.",
+        "Toss everything with olive oil and olives."
+      ]
+    },
+    {
+      "id": "meal_tuna_avocado",
+      "title": "Tuna Avocado Bowl",
+      "type": "lunch",
+      "diets": [
+        "keto",
+        "paleo",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 8,
+      "calories": 376,
+      "protein": 34,
+      "carbs": 10,
+      "fat": 24,
+      "ingredients": [
+        {
+          "foodId": "protein_tuna",
+          "name": "Tuna (canned, water)",
+          "amount": "120 g",
+          "grams": 120,
+          "kcal": 139
+        },
+        {
+          "foodId": "fat_avocado",
+          "name": "Avocado",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 160
+        },
+        {
+          "foodId": "veg_lettuce",
+          "name": "Lettuce",
+          "amount": "40 g",
+          "grams": 40,
+          "kcal": 6
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "2 tsp",
+          "grams": 8,
+          "kcal": 71
+        },
+        {
+          "name": "Lemon",
+          "amount": "1 wedge",
+          "kcal": 0
+        }
+      ],
+      "steps": [
+        "Flake the tuna over lettuce.",
+        "Add sliced avocado.",
+        "Dress with olive oil and lemon."
+      ]
+    },
+    {
+      "id": "meal_turkey_wraps",
+      "title": "Turkey Lettuce Wraps",
+      "type": "lunch",
+      "diets": [
+        "keto",
+        "paleo",
+        "anything"
+      ],
+      "timeMinutes": 15,
+      "calories": 465,
+      "protein": 46,
+      "carbs": 8,
+      "fat": 28,
+      "ingredients": [
+        {
+          "foodId": "protein_turkey",
+          "name": "Turkey",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 284
+        },
+        {
+          "foodId": "veg_lettuce",
+          "name": "Lettuce",
+          "amount": "50 g",
+          "grams": 50,
+          "kcal": 8
+        },
+        {
+          "foodId": "veg_tomato",
+          "name": "Tomato",
+          "amount": "40 g",
+          "grams": 40,
+          "kcal": 7
+        },
+        {
+          "foodId": "fat_avocado",
+          "name": "Avocado",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 96
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "2 tsp",
+          "grams": 8,
+          "kcal": 71
+        }
+      ],
+      "steps": [
+        "Cook and season the turkey.",
+        "Spoon into lettuce leaves.",
+        "Top with tomato and avocado."
+      ]
+    },
+    {
+      "id": "meal_paleo_chicken_veg",
+      "title": "Paleo Roast Chicken & Veg",
+      "type": "dinner",
+      "diets": [
+        "paleo",
+        "keto",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 35,
+      "calories": 470,
+      "protein": 58,
+      "carbs": 10,
+      "fat": 21,
+      "ingredients": [
+        {
+          "foodId": "protein_chicken_breast",
+          "name": "Chicken breast",
+          "amount": "180 g",
+          "grams": 180,
+          "kcal": 297
+        },
+        {
+          "foodId": "veg_zucchini",
+          "name": "Zucchini",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 17
+        },
+        {
+          "foodId": "veg_bell_pepper",
+          "name": "Bell pepper",
+          "amount": "80 g",
+          "grams": 80,
+          "kcal": 25
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "1 tbsp",
+          "grams": 14,
+          "kcal": 124
+        },
+        {
+          "foodId": "veg_garlic",
+          "name": "Garlic",
+          "amount": "5 g",
+          "grams": 5,
+          "kcal": 7
+        }
+      ],
+      "steps": [
+        "Heat oven to 200 C.",
+        "Toss chicken and vegetables with olive oil and garlic.",
+        "Roast 25-30 minutes."
+      ]
+    },
+    {
+      "id": "meal_tofu_stirfry",
+      "title": "Tofu & Vegetable Stir-Fry",
+      "type": "dinner",
+      "diets": [
+        "vegan",
+        "vegetarian",
+        "keto",
+        "anything"
+      ],
+      "timeMinutes": 20,
+      "calories": 291,
+      "protein": 18,
+      "carbs": 17,
+      "fat": 20,
+      "ingredients": [
+        {
+          "foodId": "protein_tofu",
+          "name": "Tofu",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 114
+        },
+        {
+          "foodId": "veg_broccoli",
+          "name": "Broccoli",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 34
+        },
+        {
+          "foodId": "veg_bell_pepper",
+          "name": "Bell pepper",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 19
+        },
+        {
+          "foodId": "veg_mushroom",
+          "name": "Mushroom",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 13
+        },
+        {
+          "foodId": "fat_coconut_oil",
+          "name": "Coconut oil",
+          "amount": "1 tbsp",
+          "grams": 12,
+          "kcal": 103
+        },
+        {
+          "foodId": "veg_garlic",
+          "name": "Garlic",
+          "amount": "5 g",
+          "grams": 5,
+          "kcal": 7
+        }
+      ],
+      "steps": [
+        "Press and cube the tofu.",
+        "Sear tofu in coconut oil; set aside.",
+        "Stir-fry vegetables and garlic.",
+        "Return tofu and toss."
+      ]
+    },
+    {
+      "id": "meal_protein_smoothie",
+      "title": "Berry Protein Smoothie",
+      "type": "snack",
+      "diets": [
+        "vegetarian",
+        "anything"
+      ],
+      "timeMinutes": 5,
+      "calories": 288,
+      "protein": 28,
+      "carbs": 31,
+      "fat": 8,
+      "ingredients": [
+        {
+          "foodId": "protein_whey",
+          "name": "Whey protein",
+          "amount": "1 scoop",
+          "grams": 30,
+          "kcal": 120
+        },
+        {
+          "foodId": "fruit_banana",
+          "name": "Banana",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 89
+        },
+        {
+          "foodId": "dairy_almond_milk",
+          "name": "Almond milk (unsweetened)",
+          "amount": "200 g",
+          "grams": 200,
+          "kcal": 30
+        },
+        {
+          "foodId": "fat_chia",
+          "name": "Chia seeds",
+          "amount": "10 g",
+          "grams": 10,
+          "kcal": 49
+        }
+      ],
+      "steps": [
+        "Add all ingredients to a blender.",
+        "Blend until smooth."
+      ]
+    },
+    {
+      "id": "meal_cottage_fruit",
+      "title": "Cottage Cheese & Fruit",
+      "type": "snack",
+      "diets": [
+        "vegetarian",
+        "keto",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 3,
+      "calories": 276,
+      "protein": 19,
+      "carbs": 15,
+      "fat": 16,
+      "ingredients": [
+        {
+          "foodId": "dairy_cottage_cheese",
+          "name": "Cottage cheese",
+          "amount": "150 g",
+          "grams": 150,
+          "kcal": 147
+        },
+        {
+          "foodId": "fruit_peach",
+          "name": "Peach",
+          "amount": "80 g",
+          "grams": 80,
+          "kcal": 31
+        },
+        {
+          "foodId": "fat_walnuts",
+          "name": "Walnuts",
+          "amount": "15 g",
+          "grams": 15,
+          "kcal": 98
+        }
+      ],
+      "steps": [
+        "Spoon cottage cheese into a bowl.",
+        "Top with sliced peach and walnuts."
+      ]
+    },
+    {
+      "id": "meal_veg_pasta",
+      "title": "Veggie Whole-Wheat Pasta",
+      "type": "dinner",
+      "diets": [
+        "vegetarian",
+        "vegan",
+        "mediterranean",
+        "anything"
+      ],
+      "timeMinutes": 20,
+      "calories": 426,
+      "protein": 12,
+      "carbs": 63,
+      "fat": 14,
+      "ingredients": [
+        {
+          "foodId": "carb_pasta",
+          "name": "Pasta",
+          "amount": "180 g",
+          "grams": 180,
+          "kcal": 284
+        },
+        {
+          "foodId": "veg_tomato",
+          "name": "Tomato",
+          "amount": "100 g",
+          "grams": 100,
+          "kcal": 18
+        },
+        {
+          "foodId": "veg_zucchini",
+          "name": "Zucchini",
+          "amount": "60 g",
+          "grams": 60,
+          "kcal": 10
+        },
+        {
+          "foodId": "fat_olive_oil",
+          "name": "Olive oil",
+          "amount": "1 tbsp",
+          "grams": 12,
+          "kcal": 106
+        },
+        {
+          "foodId": "veg_garlic",
+          "name": "Garlic",
+          "amount": "5 g",
+          "grams": 5,
+          "kcal": 7
+        },
+        {
+          "name": "Basil",
+          "amount": "to taste",
+          "kcal": 0
+        }
+      ],
+      "steps": [
+        "Cook the pasta.",
+        "Saute zucchini, tomato and garlic in olive oil.",
+        "Toss with pasta and basil."
+      ]
+    }
+  ],
+  "samplePlan": {
+    "note": "Illustrative structure. Runtime plans are filtered by the chosen diet and liked foods.",
+    "days": [
+      {
+        "dayNumber": 1,
+        "meals": [
+          "meal_keto_spinach_omelette",
+          "meal_grilled_chicken_salad",
+          "meal_salmon_greens"
+        ]
+      },
+      {
+        "dayNumber": 2,
+        "meals": [
+          "meal_greek_yogurt_bowl",
+          "meal_quinoa_salad",
+          "meal_tofu_stirfry"
+        ]
+      },
+      {
+        "dayNumber": 3,
+        "meals": [
+          "meal_banana_oatmeal",
+          "meal_tuna_avocado",
+          "meal_veg_pasta"
+        ]
+      }
+    ]
+  }
+}
