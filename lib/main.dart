@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
@@ -8,6 +9,7 @@ import 'core/db/app_database.dart';
 import 'core/providers/app_providers.dart';
 import 'core/services/ads_service.dart';
 import 'core/services/crash_reporter.dart';
+import 'core/services/notification_service.dart';
 
 Future<void> main() async {
   // runZonedGuarded + FlutterError.onError catch every uncaught error so a
@@ -15,6 +17,11 @@ Future<void> main() async {
   // without touching call sites. See crash_reporter.dart.
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+
+    // Portrait only.
+    await SystemChrome.setPreferredOrientations(
+      const [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+    );
 
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
@@ -34,6 +41,7 @@ Future<void> main() async {
 
     // Ads (free, ad-supported) — gather consent, then initialise. Best-effort.
     unawaited(AdsService.instance.bootstrap());
+    unawaited(NotificationService.instance.init());
 
     runApp(
       UncontrolledProviderScope(

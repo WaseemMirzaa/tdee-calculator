@@ -6,6 +6,7 @@ import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/util/units.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/services/notification_service.dart';
 import '../../router.dart';
 import '../../widgets/vita.dart';
 import '../onboarding/onboarding_draft.dart';
@@ -141,6 +142,8 @@ class MoreScreen extends ConsumerWidget {
       ref.invalidate(favoritesProvider);
       ref.invalidate(foodPrefsProvider);
       ref.invalidate(weighInsProvider);
+      ref.invalidate(kitchenProvider);
+      NotificationService.instance.cancelRestockReminder();
       ref.read(selectedDietProvider.notifier).select('anything');
       if (context.mounted) context.go(Routes.welcome);
     }

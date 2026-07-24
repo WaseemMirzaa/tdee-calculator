@@ -24,7 +24,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const _dbName = 'vita.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   Database? _db;
 
@@ -36,8 +36,15 @@ class AppDatabase {
       version: _dbVersion,
       onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
     return _db!;
+  }
+
+  Future<void> _onUpgrade(Database db, int oldV, int newV) async {
+    if (oldV < 2) {
+      await db.execute('CREATE TABLE IF NOT EXISTS kitchen (item TEXT PRIMARY KEY)');
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -72,6 +79,25 @@ class AppDatabase {
         PRIMARY KEY (day, slot)
       )''');
     await db.execute('CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT)');
+    await db.execute('CREATE TABLE kitchen (item TEXT PRIMARY KEY)');
+  }
+
+  // --- Kitchen / pantry (items the user already has) ----------------------
+
+  Future<Set<String>> loadKitchen() async {
+    final db = await _database;
+    final rows = await db.query('kitchen');
+    return rows.map((r) => r['item'] as String).toSet();
+  }
+
+  Future<void> setKitchen(Set<String> items) async {
+    final db = await _database;
+    final batch = db.batch();
+    batch.delete('kitchen');
+    for (final it in items) {
+      batch.insert('kitchen', {'item': it});
+    }
+    await batch.commit(noResult: true);
   }
 
   // --- Profile ------------------------------------------------------------
@@ -245,7 +271,7 @@ class AppDatabase {
     settingsCache.clear();
     final db = await _database;
     final batch = db.batch();
-    for (final t in ['profile', 'weigh_ins', 'food_prefs', 'favorites', 'plan_entries', 'settings']) {
+    for (final t in ['profile', 'weigh_ins', 'food_prefs', 'favorites', 'plan_entries', 'settings', 'kitchen']) {
       batch.delete(t);
     }
     await batch.commit(noResult: true);

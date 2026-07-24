@@ -160,6 +160,28 @@ class FavoritesNotifier extends AsyncNotifier<Set<String>> {
 final favoritesProvider =
     AsyncNotifierProvider<FavoritesNotifier, Set<String>>(FavoritesNotifier.new);
 
+/// Items the user already has in their kitchen/pantry. Persisted, so the
+/// shopping list's "have this" ticks survive app restarts.
+class KitchenNotifier extends AsyncNotifier<Set<String>> {
+  @override
+  Future<Set<String>> build() => ref.read(dbProvider).loadKitchen();
+
+  Future<void> toggle(String item) async {
+    final current = {...?state.valueOrNull};
+    current.contains(item) ? current.remove(item) : current.add(item);
+    await ref.read(dbProvider).setKitchen(current);
+    state = AsyncData(current);
+  }
+
+  Future<void> clear() async {
+    await ref.read(dbProvider).setKitchen({});
+    state = const AsyncData({});
+  }
+}
+
+final kitchenProvider =
+    AsyncNotifierProvider<KitchenNotifier, Set<String>>(KitchenNotifier.new);
+
 /// The generated meal plan. Rebuilds from persisted entries on launch;
 /// [regenerate] creates a fresh plan from the current diet + likes + goal and
 /// persists it.
@@ -207,6 +229,8 @@ class PlanNotifier extends AsyncNotifier<List<PlannedDay>> {
       seed: seed,
     );
     await _persist(planned);
+    // Record when this plan started so we can compute when it runs out.
+    ref.read(dbProvider).setSetting('plan_start', DateTime.now().millisecondsSinceEpoch.toString());
     state = AsyncData(planned);
   }
 

@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'vita_tokens.dart';
+
+/// Status-bar / nav-bar overlay style for a given brightness: dark icons on
+/// light grounds, light icons on dark grounds — correct on every screen.
+SystemUiOverlayStyle vitaOverlayStyle(bool isDark, Color navBarColor) {
+  return SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark, // Android
+    statusBarBrightness: isDark ? Brightness.dark : Brightness.light, // iOS
+    systemNavigationBarColor: navBarColor,
+    systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+    systemNavigationBarDividerColor: navBarColor,
+  );
+}
 
 /// Builds Material [ThemeData] for light and dark from Vita tokens, and exposes
 /// the resolved [VitaPalette] + text styles via `context.vita` / `context.vt`.
@@ -39,6 +53,7 @@ class VitaTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
+        systemOverlayStyle: vitaOverlayStyle(p.isDark, p.ground),
         titleTextStyle: TextStyle(
           color: p.ink,
           fontSize: 20,

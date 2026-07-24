@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/providers/app_providers.dart';
+import 'core/theme/vita_tokens.dart';
 import 'core/theme/vita_theme.dart';
 import 'router.dart';
 
@@ -20,6 +22,18 @@ class VitaApp extends ConsumerWidget {
       darkTheme: VitaTheme.dark(scheme),
       themeMode: themeMode,
       routerConfig: router,
+      builder: (context, child) {
+        // Apply the correct status-bar style app-wide, including screens with no
+        // AppBar (home shell, onboarding). Re-evaluates on theme change.
+        final isDark = themeMode == ThemeMode.dark ||
+            (themeMode == ThemeMode.system &&
+                MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+        final ground = isDark ? VitaColors.dGround : VitaColors.lPaper;
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: vitaOverlayStyle(isDark, ground),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

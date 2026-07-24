@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/meal_planner.dart';
 import '../../core/models/meal.dart';
@@ -8,6 +9,7 @@ import '../../core/tdee_engine.dart';
 import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';
+import '../../core/services/notification_service.dart';
 import '../../router.dart';
 import '../../widgets/vita.dart';
 
@@ -196,6 +198,10 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
           ? a.name.compareTo(b.name)
           : a.category.compareTo(b.category));
 
+    final startMs = int.tryParse(ref.read(dbProvider).getSettingSync('plan_start') ?? '');
+    final start = startMs != null ? DateTime.fromMillisecondsSinceEpoch(startMs) : DateTime.now();
+    final finish = DateTime(start.year, start.month, start.day + days.length);
+
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true, // critical — otherwise the sheet is tiny/clipped
@@ -203,7 +209,7 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
       showDragHandle: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
-      builder: (_) => _ShoppingSheet(items: items, dayCount: days.length),
+      builder: (_) => _ShoppingSheet(items: items, planDays: days.length, finishDate: finish),
     );
   }
 }
@@ -216,94 +222,69 @@ class _ShopItem {
   final String category;
 }
 
-/// An interactive, checkable shopping list. Ticking an item strikes it through.
-class _ShoppingSheet extends StatefulWidget {
-  const _ShoppingSheet({required this.items, required this.dayCount});
+/// An interactive shopping list backed by the persistent kitchen: tap an item
+/// to mark it "already have" (it moves to your kitchen and is remembered).
+/// Shows how long the plan lasts and can schedule a restock reminder.
+class _ShoppingSheet extends ConsumerStatefulWidget {
+  const _ShoppingSheet({required this.items, required this.planDays, required this.finishDate});
   final List<_ShopItem> items;
-  final int dayCount;
+  final int planDays;
+  final DateTime finishDate;
 
   @override
-  State<_ShoppingSheet> createState() => _ShoppingSheetState();
+  ConsumerState<_ShoppingSheet> createState() => _ShoppingSheetState();
 }
 
-class _ShoppingSheetState extends State<_ShoppingSheet> {
-  final _checked = <String>{};
+class _ShoppingSheetState extends ConsumerState<_ShoppingSheet> {
+  late int _lead = int.tryParse(ref.read(dbProvider).getSettingSync('shop_lead_days') ?? '2') ?? 2;
 
   static String _catLabel(String c) {
     const labels = {
-      'protein': 'Protein',
-      'carbs': 'Carbs',
-      'fat': 'Fats & oils',
-      'fruits': 'Fruits',
-      'vegetables': 'Vegetables',
-      'dairy': 'Dairy & drinks',
+      'protein': 'Protein', 'carbs': 'Carbs', 'fat': 'Fats & oils',
+      'fruits': 'Fruits', 'vegetables': 'Vegetables', 'dairy': 'Dairy & drinks',
       'other': 'Pantry & spices',
     };
     return labels[c] ?? 'Other';
   }
 
+  DateTime get _remindWhen {
+    final base = widget.finishDate.subtract(Duration(days: _lead));
+    return DateTime(base.year, base.month, base.day, 18);
+  }
+
+  void _toast(String m) {
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+  }
+
+  Future<void> _setLead(int d) async {
+    setState(() => _lead = d);
+    ref.read(dbProvider).setSetting('shop_lead_days', '$d');
+    if (d == 0) {
+      await NotificationService.instance.cancelRestockReminder();
+      _toast('Restock reminder turned off');
+      return;
+    }
+    final granted = await NotificationService.instance.requestPermission();
+    if (!granted) {
+      _toast('Enable notifications to get reminders');
+      return;
+    }
+    await NotificationService.instance
+        .scheduleRestockReminder(when: _remindWhen, planDays: widget.planDays);
+    _toast("We'll remind you on ${DateFormat('EEE, MMM d').format(_remindWhen)}");
+  }
+
   @override
   Widget build(BuildContext context) {
     final v = context.vita;
-    // Build a flat list of [category-header, ...items] entries.
-    final rows = <Widget>[];
-    String? lastCat;
-    for (final it in widget.items) {
-      if (it.category != lastCat) {
-        lastCat = it.category;
-        rows.add(Padding(
-          padding: const EdgeInsets.fromLTRB(2, 16, 2, 8),
-          child: SectionLabel(_catLabel(it.category)),
-        ));
-      }
-      final done = _checked.contains(it.name);
-      rows.add(
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => setState(() => done ? _checked.remove(it.name) : _checked.add(it.name)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 9),
-            child: Row(
-              children: [
-                AnimatedContainer(
-                  duration: VitaMotion.fast,
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: done ? v.brand : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: done ? v.brand : v.line, width: 1.6),
-                  ),
-                  child: done
-                      ? const Icon(Icons.check_rounded, size: 15, color: Colors.white)
-                      : null,
-                ),
-                const SizedBox(width: 13),
-                Expanded(
-                  child: Text(
-                    it.name,
-                    style: TextStyle(
-                      color: done ? v.muted : v.ink,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      decoration: done ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                ),
-                if (it.grams > 0)
-                  Text('${it.grams.round()} g',
-                      style: context.mono(size: 13, color: v.muted)),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    final kitchen = ref.watch(kitchenProvider).valueOrNull ?? <String>{};
+    final toBuy = widget.items.where((i) => !kitchen.contains(i.name)).toList();
+    final have = widget.items.where((i) => kitchen.contains(i.name)).toList();
 
     return SafeArea(
       top: false,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.78),
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -317,15 +298,14 @@ class _ShoppingSheetState extends State<_ShoppingSheet> {
                       children: [
                         Text('Shopping list', style: context.vt.titleLarge),
                         Text(
-                          '${widget.items.length} items · ${widget.dayCount} days · ${_checked.length} ticked',
+                          'Lasts ${widget.planDays} days · ends ${DateFormat('MMM d').format(widget.finishDate)}',
                           style: TextStyle(color: v.muted, fontSize: 13),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    width: 46,
-                    height: 46,
+                    width: 46, height: 46,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(color: v.brand.withOpacity(0.12), shape: BoxShape.circle),
                     child: const Text('🛒', style: TextStyle(fontSize: 22)),
@@ -335,12 +315,140 @@ class _ShoppingSheetState extends State<_ShoppingSheet> {
             ),
             Flexible(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(22, 0, 22, 20),
-                children: rows,
+                padding: const EdgeInsets.fromLTRB(22, 8, 22, 24),
+                children: [
+                  _ReminderCard(lead: _lead, remindWhen: _remindWhen, onLead: _setLead),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(2, 16, 2, 4),
+                    child: SectionLabel('To buy · ${toBuy.length}'),
+                  ),
+                  if (toBuy.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text('Everything is in your kitchen 🎉',
+                          style: TextStyle(color: v.muted, fontSize: 14)),
+                    )
+                  else
+                    ..._grouped(toBuy),
+                  if (have.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(2, 20, 2, 4),
+                      child: SectionLabel('In your kitchen · ${have.length}'),
+                    ),
+                    for (final it in have) _itemRow(it, inKitchen: true),
+                  ],
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  List<Widget> _grouped(List<_ShopItem> items) {
+    final rows = <Widget>[];
+    String? lastCat;
+    for (final it in items) {
+      if (it.category != lastCat) {
+        lastCat = it.category;
+        rows.add(Padding(
+          padding: const EdgeInsets.fromLTRB(2, 12, 2, 4),
+          child: Text(_catLabel(it.category),
+              style: TextStyle(fontWeight: FontWeight.w700, color: context.vita.inkSoft, fontSize: 13)),
+        ));
+      }
+      rows.add(_itemRow(it, inKitchen: false));
+    }
+    return rows;
+  }
+
+  Widget _itemRow(_ShopItem it, {required bool inKitchen}) {
+    final v = context.vita;
+    return InkWell(
+      onTap: () => ref.read(kitchenProvider.notifier).toggle(it.name),
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 2),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: VitaMotion.fast,
+              width: 24, height: 24,
+              decoration: BoxDecoration(
+                color: inKitchen ? v.brand : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: inKitchen ? v.brand : v.line, width: 1.6),
+              ),
+              child: inKitchen ? const Icon(Icons.check_rounded, size: 15, color: Colors.white) : null,
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Text(it.name,
+                  style: TextStyle(
+                    color: inKitchen ? v.muted : v.ink,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    decoration: inKitchen ? TextDecoration.lineThrough : null,
+                  )),
+            ),
+            if (it.grams > 0)
+              Text('${it.grams.round()} g', style: context.mono(size: 13, color: v.muted)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The restock-reminder control: choose how many days ahead to be reminded.
+class _ReminderCard extends StatelessWidget {
+  const _ReminderCard({required this.lead, required this.remindWhen, required this.onLead});
+  final int lead;
+  final DateTime remindWhen;
+  final ValueChanged<int> onLead;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = context.vita;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: v.brand.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: v.brand.withOpacity(0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.notifications_active_rounded, size: 18, color: v.brand),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Restock reminder',
+                    style: TextStyle(fontWeight: FontWeight.w800, color: v.ink, fontSize: 15)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            lead == 0
+                ? "Off — we won't remind you."
+                : "We'll notify you on ${DateFormat('EEE, MMM d').format(remindWhen)}.",
+            style: TextStyle(color: v.inkSoft, fontSize: 13),
+          ),
+          const SizedBox(height: 12),
+          VitaSegmented<int>(
+            value: lead,
+            onChanged: onLead,
+            segments: const [
+              VitaSegment(2, '2 days'),
+              VitaSegment(1, '1 day'),
+              VitaSegment(0, 'Off'),
+            ],
+          ),
+        ],
       ),
     );
   }
