@@ -43,8 +43,13 @@ class MealPlanBody extends ConsumerStatefulWidget {
 }
 
 class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
-  int _day = 1;
+  late int _day = int.tryParse(ref.read(dbProvider).getSettingSync('plan_selected_day') ?? '1') ?? 1;
   bool _busy = false;
+
+  void _setDay(int n) {
+    setState(() => _day = n);
+    ref.read(dbProvider).setSetting('plan_selected_day', '$n');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +57,7 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
     final result = ref.watch(resultProvider);
     final profile = ref.watch(profileProvider).valueOrNull;
     final favorites = ref.watch(favoritesProvider).valueOrNull ?? <String>{};
+    final servings = ref.watch(servingsProvider).valueOrNull ?? const <String, double>{};
     final v = context.vita;
 
     return planAsync.when(
@@ -61,9 +67,19 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
         if (days.isEmpty) return const SizedBox.shrink();
         _day = _day.clamp(1, days.length);
         final today = days.firstWhere((d) => d.dayNumber == _day, orElse: () => days.first);
+        double sv(int slot) => servings['${today.dayNumber}:$slot'] ?? 1.0;
+        // Day macro/kcal totals scaled by each slot's chosen serving size.
+        var dayKcal = 0.0, dayP = 0.0, dayC = 0.0, dayF = 0.0;
+        for (var i = 0; i < today.meals.length; i++) {
+          final s = sv(i);
+          dayKcal += today.meals[i].calories * s;
+          dayP += today.meals[i].protein * s;
+          dayC += today.meals[i].carbs * s;
+          dayF += today.meals[i].fat * s;
+        }
         final target = result != null && profile != null
             ? goalTargetCalories(result, profile.goal)
-            : today.calories;
+            : dayKcal;
 
         return ListView(
           padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
@@ -79,7 +95,7 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
                   final n = days[i].dayNumber;
                   final sel = n == _day;
                   return GestureDetector(
-                    onTap: () => setState(() => _day = n),
+                    onTap: () => _setDay(n),
                     child: Container(
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -100,14 +116,16 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
             const SizedBox(height: 16),
 
             // Day summary
-            _DaySummary(day: today, target: target),
+            _DaySummary(kcal: dayKcal, protein: dayP, carbs: dayC, fat: dayF, target: target),
             const SizedBox(height: 16),
 
             for (var i = 0; i < today.meals.length; i++) ...[
               _MealCard(
                 meal: today.meals[i],
+                servings: sv(i),
                 isFavorite: favorites.contains(today.meals[i].id),
-                onOpen: () => context.push('${Routes.meal}/${today.meals[i].id}'),
+                onOpen: () => context.push(
+                    '${Routes.meal}/${today.meals[i].id}?day=${today.dayNumber}&slot=$i'),
                 onFavorite: () => ref.read(favoritesProvider.notifier).toggle(today.meals[i].id),
                 onSwap: () => _swap(today.dayNumber, i, today.meals[i]),
               ),
@@ -162,6 +180,7 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
         _busy = false;
         _day = newDay;
       });
+      ref.read(dbProvider).setSetting('plan_selected_day', '$newDay');
     }
   }
 
@@ -577,14 +596,23 @@ class _ReminderCard extends StatelessWidget {
 }
 
 class _DaySummary extends StatelessWidget {
-  const _DaySummary({required this.day, required this.target});
-  final PlannedDay day;
+  const _DaySummary({
+    required this.kcal,
+    required this.protein,
+    required this.carbs,
+    required this.fat,
+    required this.target,
+  });
+  final double kcal;
+  final double protein;
+  final double carbs;
+  final double fat;
   final double target;
 
   @override
   Widget build(BuildContext context) {
     final v = context.vita;
-    final pct = (day.calories / target).clamp(0.0, 1.3);
+    final pct = (kcal / target).clamp(0.0, 1.3);
     return VitaCard(
       child: Column(
         children: [
@@ -600,16 +628,16 @@ class _DaySummary extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text('${day.calories.round()}', style: context.mono(size: 28)),
+                      Text('${kcal.round()}', style: context.mono(size: 28)),
                       Text(' / ${target.round()} kcal', style: TextStyle(color: v.muted, fontSize: 13)),
                     ],
                   ),
                 ],
               ),
               const Spacer(),
-              _MiniMacro('P', day.protein),
-              _MiniMacro('C', day.carbs),
-              _MiniMacro('F', day.fat),
+              _MiniMacro('P', protein),
+              _MiniMacro('C', carbs),
+              _MiniMacro('F', fat),
             ],
           ),
           const SizedBox(height: 12),
@@ -651,12 +679,14 @@ class _MiniMacro extends StatelessWidget {
 class _MealCard extends StatelessWidget {
   const _MealCard({
     required this.meal,
+    required this.servings,
     required this.isFavorite,
     required this.onOpen,
     required this.onFavorite,
     required this.onSwap,
   });
   final Meal meal;
+  final double servings;
   final bool isFavorite;
   final VoidCallback onOpen;
   final VoidCallback onFavorite;
@@ -694,7 +724,13 @@ class _MealCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text('${meal.calories.round()} kcal', style: context.mono(size: 12.5, color: v.muted)),
+                    Text('${(meal.calories * servings).round()} kcal',
+                        style: context.mono(size: 12.5, color: v.muted)),
+                    if (servings != 1.0) ...[
+                      const SizedBox(width: 6),
+                      Text('×${servings.toStringAsFixed(servings % 1 == 0 ? 0 : 1)}',
+                          style: context.mono(size: 12.5, color: v.brand)),
+                    ],
                     const SizedBox(width: 10),
                     Icon(Icons.schedule_rounded, size: 13, color: v.muted),
                     const SizedBox(width: 3),

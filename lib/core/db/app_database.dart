@@ -56,7 +56,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const _dbName = 'vita.db';
-  static const _dbVersion = 3;
+  static const _dbVersion = 4;
 
   Database? _db;
 
@@ -82,6 +82,11 @@ class AppDatabase {
       // when they set it. Existing rows become untracked "have it" (days = 0).
       await db.execute('ALTER TABLE kitchen ADD COLUMN days INTEGER NOT NULL DEFAULT 0');
       await db.execute('ALTER TABLE kitchen ADD COLUMN start_millis INTEGER NOT NULL DEFAULT 0');
+    }
+    if (oldV < 4) {
+      // Per-slot serving multiplier chosen on the meal-detail screen.
+      await db.execute(
+          'CREATE TABLE IF NOT EXISTS meal_servings (day INTEGER NOT NULL, slot INTEGER NOT NULL, servings REAL NOT NULL, PRIMARY KEY (day, slot))');
     }
   }
 
@@ -119,6 +124,35 @@ class AppDatabase {
     await db.execute('CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT)');
     await db.execute(
         'CREATE TABLE kitchen (item TEXT PRIMARY KEY, days INTEGER NOT NULL DEFAULT 0, start_millis INTEGER NOT NULL DEFAULT 0)');
+    await db.execute(
+        'CREATE TABLE meal_servings (day INTEGER NOT NULL, slot INTEGER NOT NULL, servings REAL NOT NULL, PRIMARY KEY (day, slot))');
+  }
+
+  // --- Per-slot serving sizes --------------------------------------------
+
+  /// Serving multipliers keyed by "day:slot" (default 1 when absent).
+  Future<Map<String, double>> loadServings() async {
+    final db = await _database;
+    final rows = await db.query('meal_servings');
+    return {
+      for (final r in rows) '${r['day']}:${r['slot']}': (r['servings'] as num).toDouble(),
+    };
+  }
+
+  Future<void> setServing(int day, int slot, double servings) async {
+    final db = await _database;
+    await db.insert('meal_servings', {'day': day, 'slot': slot, 'servings': servings},
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> removeServing(int day, int slot) async {
+    final db = await _database;
+    await db.delete('meal_servings', where: 'day = ? AND slot = ?', whereArgs: [day, slot]);
+  }
+
+  Future<void> clearServings() async {
+    final db = await _database;
+    await db.delete('meal_servings');
   }
 
   // --- Kitchen / pantry (items the user already has) ----------------------
@@ -320,7 +354,7 @@ class AppDatabase {
     settingsCache.clear();
     final db = await _database;
     final batch = db.batch();
-    for (final t in ['profile', 'weigh_ins', 'food_prefs', 'favorites', 'plan_entries', 'settings', 'kitchen']) {
+    for (final t in ['profile', 'weigh_ins', 'food_prefs', 'favorites', 'plan_entries', 'settings', 'kitchen', 'meal_servings']) {
       batch.delete(t);
     }
     await batch.commit(noResult: true);

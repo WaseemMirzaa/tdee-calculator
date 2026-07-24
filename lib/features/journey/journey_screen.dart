@@ -22,8 +22,21 @@ class JourneyScreen extends ConsumerStatefulWidget {
 }
 
 class _JourneyScreenState extends ConsumerState<JourneyScreen> {
-  double? _targetKg;
-  double _rate = 0.5; // kg/week
+  // Restored from the last session so the user's goal target + pace persist.
+  late double? _targetKg =
+      double.tryParse(ref.read(dbProvider).getSettingSync('journey_target_kg') ?? '');
+  late double _rate =
+      double.tryParse(ref.read(dbProvider).getSettingSync('journey_rate') ?? '') ?? 0.5; // kg/week
+
+  void _setTarget(double t) {
+    setState(() => _targetKg = t);
+    ref.read(dbProvider).setSetting('journey_target_kg', t.toString());
+  }
+
+  void _setRate(double r) {
+    setState(() => _rate = r);
+    ref.read(dbProvider).setSetting('journey_rate', r.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +95,8 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
           date: date,
           dailyDelta: dailyDelta,
           intakeTarget: intakeTarget,
-          onTarget: (t) => setState(() => _targetKg = t),
-          onRate: (r) => setState(() => _rate = r),
+          onTarget: _setTarget,
+          onRate: _setRate,
         ),
         const SizedBox(height: 14),
 

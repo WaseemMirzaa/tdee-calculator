@@ -272,6 +272,9 @@ class PlanNotifier extends AsyncNotifier<List<PlannedDay>> {
       seed: seed,
     );
     await _persist(planned);
+    // A fresh plan invalidates any per-slot serving choices.
+    await ref.read(dbProvider).clearServings();
+    ref.invalidate(servingsProvider);
     // Record when this plan started so we can compute when it runs out.
     ref.read(dbProvider).setSetting('plan_start', DateTime.now().millisecondsSinceEpoch.toString());
     state = AsyncData(planned);
@@ -312,11 +315,16 @@ class PlanNotifier extends AsyncNotifier<List<PlannedDay>> {
     meals[slot] = replacement;
     days[idx] = PlannedDay(dayNumber: dayNumber, meals: meals);
     await _persist(days);
+    // The new meal starts at 1 serving.
+    await ref.read(dbProvider).removeServing(dayNumber, slot);
+    ref.invalidate(servingsProvider);
     state = AsyncData(days);
   }
 
   Future<void> reset() async {
     await ref.read(dbProvider).savePlan(const []);
+    await ref.read(dbProvider).clearServings();
+    ref.invalidate(servingsProvider);
     state = const AsyncData([]);
   }
 
@@ -334,6 +342,34 @@ class PlanNotifier extends AsyncNotifier<List<PlannedDay>> {
 
 final planProvider =
     AsyncNotifierProvider<PlanNotifier, List<PlannedDay>>(PlanNotifier.new);
+
+/// Per-slot serving multipliers chosen on the meal-detail screen, keyed by
+/// "day:slot". Persisted so a user's serving choice survives restarts and is
+/// reflected in the plan's day totals. Absent key ⇒ 1 serving.
+class ServingsNotifier extends AsyncNotifier<Map<String, double>> {
+  @override
+  Future<Map<String, double>> build() => ref.read(dbProvider).loadServings();
+
+  static String keyFor(int day, int slot) => '$day:$slot';
+
+  double servingFor(int day, int slot) =>
+      state.valueOrNull?[keyFor(day, slot)] ?? 1.0;
+
+  Future<void> setServing(int day, int slot, double servings) async {
+    final next = {...?state.valueOrNull};
+    if (servings == 1.0) {
+      next.remove(keyFor(day, slot));
+      await ref.read(dbProvider).removeServing(day, slot);
+    } else {
+      next[keyFor(day, slot)] = servings;
+      await ref.read(dbProvider).setServing(day, slot, servings);
+    }
+    state = AsyncData(next);
+  }
+}
+
+final servingsProvider =
+    AsyncNotifierProvider<ServingsNotifier, Map<String, double>>(ServingsNotifier.new);
 
 // ---------------------------------------------------------------------------
 // Journey: weigh-ins

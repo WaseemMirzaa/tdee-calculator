@@ -10,8 +10,13 @@ import '../../widgets/vita.dart';
 /// S12 · Meal detail. Ingredients / Making tabs + a macro summary header and a
 /// serving scaler that recomputes grams & kcal live.
 class MealDetailScreen extends ConsumerStatefulWidget {
-  const MealDetailScreen({super.key, required this.mealId});
+  const MealDetailScreen({super.key, required this.mealId, this.day, this.slot});
   final String mealId;
+
+  /// The plan slot this meal was opened from, if any. When present, the chosen
+  /// serving size is persisted per (day, slot) so it survives restarts.
+  final int? day;
+  final int? slot;
 
   @override
   ConsumerState<MealDetailScreen> createState() => _MealDetailScreenState();
@@ -19,7 +24,18 @@ class MealDetailScreen extends ConsumerStatefulWidget {
 
 class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
   int _tab = 0;
-  double _servings = 1;
+  // Only used when the meal isn't opened from a plan slot (no place to persist).
+  double _localServings = 1;
+
+  bool get _persisted => widget.day != null && widget.slot != null;
+
+  void _setServings(double value) {
+    if (_persisted) {
+      ref.read(servingsProvider.notifier).setServing(widget.day!, widget.slot!, value);
+    } else {
+      setState(() => _localServings = value);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +45,9 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
     if (meal == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    final servings = _persisted
+        ? (ref.watch(servingsProvider).valueOrNull?['${widget.day}:${widget.slot}'] ?? 1.0)
+        : _localServings;
     final favorites = ref.watch(favoritesProvider).valueOrNull ?? <String>{};
     final fav = favorites.contains(meal.id);
 
@@ -51,9 +70,9 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
             child: Row(
               children: [
                 MacroDonut(
-                  proteinG: meal.protein * _servings,
-                  carbG: meal.carbs * _servings,
-                  fatG: meal.fat * _servings,
+                  proteinG: meal.protein * servings,
+                  carbG: meal.carbs * servings,
+                  fatG: meal.fat * servings,
                   size: 76,
                 ),
                 const SizedBox(width: 16),
@@ -61,13 +80,13 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${(meal.calories * _servings).round()} kcal', style: context.mono(size: 22)),
+                      Text('${(meal.calories * servings).round()} kcal', style: context.mono(size: 22)),
                       Text('${kMealTypeLabels[meal.type]} · ${meal.timeMinutes} min', style: TextStyle(color: v.muted, fontSize: 12.5)),
                       const SizedBox(height: 8),
                       Wrap(spacing: 12, runSpacing: 4, children: [
-                        _macroTag('Protein', meal.protein * _servings),
-                        _macroTag('Carbs', meal.carbs * _servings),
-                        _macroTag('Fat', meal.fat * _servings),
+                        _macroTag('Protein', meal.protein * servings),
+                        _macroTag('Carbs', meal.carbs * servings),
+                        _macroTag('Fat', meal.fat * servings),
                       ]),
                     ],
                   ),
@@ -82,9 +101,9 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
             children: [
               Text('Servings', style: TextStyle(fontWeight: FontWeight.w700, color: v.ink)),
               const Spacer(),
-              _ScaleBtn(icon: Icons.remove_rounded, onTap: _servings > 0.5 ? () => setState(() => _servings -= 0.5) : null),
-              SizedBox(width: 48, child: Center(child: Text(_servings.toStringAsFixed(1), style: context.mono(size: 17)))),
-              _ScaleBtn(icon: Icons.add_rounded, onTap: _servings < 6 ? () => setState(() => _servings += 0.5) : null),
+              _ScaleBtn(icon: Icons.remove_rounded, onTap: servings > 0.5 ? () => _setServings(servings - 0.5) : null),
+              SizedBox(width: 48, child: Center(child: Text(servings.toStringAsFixed(1), style: context.mono(size: 17)))),
+              _ScaleBtn(icon: Icons.add_rounded, onTap: servings < 6 ? () => _setServings(servings + 0.5) : null),
             ],
           ),
           const SizedBox(height: 14),
@@ -97,7 +116,7 @@ class _MealDetailScreenState extends ConsumerState<MealDetailScreen> {
           const SizedBox(height: 16),
 
           if (_tab == 0)
-            _IngredientsList(meal: meal, servings: _servings)
+            _IngredientsList(meal: meal, servings: servings)
           else
             _StepsList(meal: meal),
         ],

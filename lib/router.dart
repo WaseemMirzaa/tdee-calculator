@@ -74,7 +74,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.mealPlan, builder: (c, s) => const MealPlanScreen()),
       GoRoute(
         path: '${Routes.meal}/:id',
-        builder: (c, s) => MealDetailScreen(mealId: s.pathParameters['id']!),
+        builder: (c, s) => MealDetailScreen(
+          mealId: s.pathParameters['id']!,
+          day: int.tryParse(s.uri.queryParameters['day'] ?? ''),
+          slot: int.tryParse(s.uri.queryParameters['slot'] ?? ''),
+        ),
       ),
     ],
   );
