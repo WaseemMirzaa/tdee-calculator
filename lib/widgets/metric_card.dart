@@ -1,59 +1,62 @@
 import 'package:flutter/material.dart';
-import '../core/theme/vita_tokens.dart';
 import '../core/theme/vita_theme.dart';
+import 'cards.dart';
 
-/// A compact metric tile (BMI / BMR / RMR / IBW) for the results grid.
-/// [locked] blurs nothing here (value is shown free per spec) but shows a lock
-/// glyph indicating the *detail view* is Pro. Tapping calls [onTap].
+/// A premium metric tile (BMI / BMR / RMR / IBW) for the results grid: a
+/// tinted icon chip, a mono value in the metric's accent colour, and a caption.
 class MetricCard extends StatelessWidget {
   const MetricCard({
     super.key,
     required this.label,
     required this.value,
+    required this.icon,
+    required this.accentColor,
     this.caption,
     this.onTap,
-    this.locked = false,
-    this.accentColor,
   });
 
   final String label;
   final String value;
+  final IconData icon;
+  final Color accentColor;
   final String? caption;
   final VoidCallback? onTap;
-  final bool locked;
-  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final v = context.vita;
-    return GestureDetector(
+    return VitaCard(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: v.card,
-          borderRadius: VitaRadius.smR,
-          border: Border.all(color: v.line),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: v.muted)),
-                const Spacer(),
-                Icon(locked ? Icons.lock_rounded : Icons.arrow_forward_rounded,
-                    size: 14, color: locked ? v.muted : v.brand),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(value, style: context.mono(size: 18, color: accentColor ?? v.ink)),
-            if (caption != null) ...[
-              const SizedBox(height: 2),
-              Text(caption!, style: TextStyle(fontSize: 11.5, color: v.muted)),
+      padding: const EdgeInsets.all(14),
+      radius: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(icon, size: 18, color: accentColor),
+              ),
+              const Spacer(),
+              Icon(Icons.north_east_rounded, size: 15, color: v.muted),
             ],
+          ),
+          const SizedBox(height: 12),
+          Text(label.toUpperCase(), style: context.monoLabel(size: 10)),
+          const SizedBox(height: 3),
+          Text(value, style: context.mono(size: 19, color: v.ink)),
+          if (caption != null) ...[
+            const SizedBox(height: 2),
+            Text(caption!, style: TextStyle(fontSize: 11.5, color: v.muted)),
           ],
-        ),
+        ],
       ),
     );
   }

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../core/tdee_engine.dart';
 import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';
-import '../../router.dart';
 import '../../widgets/vita.dart';
 
 /// S7 · Health-metric detail. Value + category band + a plain-language
-/// explainer. The deep explainer is a Pro feature (honest blurred preview).
+/// explainer — all free.
 class MetricDetailScreen extends ConsumerWidget {
   const MetricDetailScreen({super.key, required this.metric});
   final String metric;
@@ -18,7 +16,6 @@ class MetricDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final result = ref.watch(resultProvider);
-    final isPremium = ref.watch(premiumProvider);
     if (result == null) return const Scaffold(body: SizedBox.shrink());
 
     final spec = _spec(metric, result);
@@ -63,25 +60,21 @@ class MetricDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 14),
           ],
-          LockedScrim(
-            locked: !isPremium,
-            onUnlock: () => context.push(Routes.paywall),
-            child: VitaCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.auto_awesome_rounded, size: 17, color: context.vita.brand),
-                      const SizedBox(width: 8),
-                      Text('What this means for you',
-                          style: TextStyle(fontWeight: FontWeight.w800, color: context.vita.ink, fontSize: 15)),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(spec.explainer, style: TextStyle(color: context.vita.inkSoft, height: 1.55, fontSize: 14.5)),
-                ],
-              ),
+          VitaCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.auto_awesome_rounded, size: 17, color: context.vita.brand),
+                    const SizedBox(width: 8),
+                    Text('What this means for you',
+                        style: TextStyle(fontWeight: FontWeight.w800, color: context.vita.ink, fontSize: 15)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(spec.explainer, style: TextStyle(color: context.vita.inkSoft, height: 1.55, fontSize: 14.5)),
+              ],
             ),
           ),
         ],

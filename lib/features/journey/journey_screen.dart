@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/journey_math.dart';
@@ -10,7 +9,6 @@ import '../../core/tdee_engine.dart';
 import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';
-import '../../router.dart';
 import '../../widgets/vita.dart';
 
 /// ★ S14 · Journey — the flagship differentiator. Turns a one-shot calculation
@@ -32,7 +30,6 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
     final result = ref.watch(resultProvider);
     final profile = ref.watch(profileProvider).valueOrNull;
     final weighIns = ref.watch(weighInsProvider).valueOrNull ?? const <WeighIn>[];
-    final isPremium = ref.watch(premiumProvider);
     final v = context.vita;
 
     if (result == null || profile == null) {
@@ -90,15 +87,11 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
         ),
         const SizedBox(height: 14),
 
-        // Adaptive TDEE (Pro)
-        LockedScrim(
-          locked: !isPremium,
-          onUnlock: () => context.push(Routes.paywall),
-          child: _AdaptiveCard(
-            weighIns: weighIns,
-            assumedIntake: intakeTarget,
-            calculatedMaintenance: result.maintenanceCalories,
-          ),
+        // Adaptive maintenance — learns your real TDEE from your data.
+        _AdaptiveCard(
+          weighIns: weighIns,
+          assumedIntake: intakeTarget,
+          calculatedMaintenance: result.maintenanceCalories,
         ),
       ],
     );
@@ -458,7 +451,7 @@ class _AdaptiveCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(color: v.brand.withOpacity(0.14), borderRadius: BorderRadius.circular(99)),
-                child: Text('PRO', style: context.monoLabel(size: 9, color: v.brandDeep)),
+                child: Text('SMART', style: context.monoLabel(size: 9, color: v.brandDeep)),
               ),
             ],
           ),

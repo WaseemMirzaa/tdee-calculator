@@ -10,7 +10,7 @@ import '../../router.dart';
 import '../../widgets/vita.dart';
 import '../onboarding/onboarding_draft.dart';
 
-/// S13 · More / Settings. Profile summary, Pro banner, recalculate, preferences
+/// S13 · More / Settings. Profile summary, recalculate, preferences
 /// (units + theme), and the standard support/legal links.
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -18,7 +18,6 @@ class MoreScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider).valueOrNull;
-    final isPremium = ref.watch(premiumProvider);
     final unit = ref.watch(unitSystemProvider);
     final themeMode = ref.watch(themeModeProvider);
     final v = context.vita;
@@ -60,11 +59,6 @@ class MoreScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
 
-        if (!isPremium) ...[
-          PremiumBanner(label: 'Unlock Vita Pro', onTap: () => context.push(Routes.paywall)),
-          const SizedBox(height: 12),
-        ],
-
         _Group(children: [
           _Tile(
             icon: Icons.refresh_rounded,
@@ -88,7 +82,6 @@ class MoreScreen extends ConsumerWidget {
         const SizedBox(height: 12),
 
         _Group(children: [
-          _Tile(icon: Icons.restore_rounded, title: 'Restore purchase', onTap: () => ref.read(purchaseServiceProvider).restore()),
           _Tile(icon: Icons.ios_share_rounded, title: 'Share Vita', onTap: () => _todo(context)),
           _Tile(icon: Icons.support_agent_rounded, title: 'Customer support', onTap: () => _todo(context)),
           _Tile(icon: Icons.star_outline_rounded, title: 'Rate us', onTap: () => _todo(context)),

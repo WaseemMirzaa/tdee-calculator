@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,7 +13,6 @@ import 'features/meals/diet_screen.dart';
 import 'features/meals/food_prefs_screen.dart';
 import 'features/meals/meal_plan_screen.dart';
 import 'features/meals/meal_detail_screen.dart';
-import 'features/paywall/paywall_screen.dart';
 import 'shell.dart';
 
 /// Route paths, in one place.
@@ -25,7 +23,6 @@ class Routes {
   static const activity = '/onboarding/activity';
   static const calculating = '/calculating';
   static const home = '/home';
-  static const paywall = '/paywall';
   static const energy = '/energy';
   static const macros = '/macros';
   static const metric = '/metric'; // /metric/:type
@@ -55,10 +52,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.activity, builder: (c, s) => const ActivityScreen()),
       GoRoute(path: Routes.calculating, builder: (c, s) => const CalculatingScreen()),
       GoRoute(path: Routes.home, builder: (c, s) => const HomeShell()),
-      GoRoute(
-        path: Routes.paywall,
-        pageBuilder: (c, s) => const MaterialPage(fullscreenDialog: true, child: PaywallScreen()),
-      ),
       GoRoute(path: Routes.energy, builder: (c, s) => const EnergyIntakeScreen()),
       GoRoute(path: Routes.macros, builder: (c, s) => const MacrosScreen()),
       GoRoute(

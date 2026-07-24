@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import '../core/theme/vita_tokens.dart';
 import '../core/theme/vita_theme.dart';
 
-/// The base surface for everything: soft card, warm hairline, low wide shadow.
+/// The base surface for everything — a premium card with a barely-there vertical
+/// gradient for depth, a hairline border, and a two-layer shadow (a tight
+/// contact shadow + a wide soft ambient). Pass [glow] for a coloured halo
+/// (hero cards) or [gradient] to override the surface entirely.
 class VitaCard extends StatelessWidget {
   const VitaCard({
     super.key,
@@ -10,38 +13,76 @@ class VitaCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(18),
     this.onTap,
     this.accent = false,
+    this.glow,
+    this.gradient,
+    this.radius = VitaRadius.card,
   });
 
   final Widget child;
   final EdgeInsets padding;
   final VoidCallback? onTap;
   final bool accent;
+  final Color? glow;
+  final Gradient? gradient;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
     final v = context.vita;
+    final br = BorderRadius.circular(radius);
+
+    final surface = gradient ??
+        LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            v.card,
+            Color.lerp(v.card, v.ground, v.isDark ? 0.42 : 0.5)!,
+          ],
+        );
+
     final card = AnimatedContainer(
       duration: VitaMotion.fast,
       padding: padding,
       decoration: BoxDecoration(
-        color: v.card,
-        borderRadius: VitaRadius.cardR,
-        border: Border.all(color: accent ? v.brand.withOpacity(0.4) : v.line),
+        gradient: surface,
+        borderRadius: br,
+        border: Border.all(
+          color: accent ? v.brand.withOpacity(0.45) : v.line,
+          width: accent ? 1.4 : 1,
+        ),
         boxShadow: [
+          // Contact shadow — tight and close.
           BoxShadow(
-            color: Colors.black.withOpacity(v.isDark ? 0.35 : 0.05),
-            blurRadius: 30,
-            offset: const Offset(0, 14),
-            spreadRadius: -18,
+            color: Colors.black.withOpacity(v.isDark ? 0.45 : 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+            spreadRadius: -4,
+          ),
+          // Ambient — wide and soft, tinted by [glow] when set.
+          BoxShadow(
+            color: glow != null
+                ? glow!.withOpacity(v.isDark ? 0.34 : 0.24)
+                : Colors.black.withOpacity(v.isDark ? 0.40 : 0.05),
+            blurRadius: glow != null ? 36 : 42,
+            offset: const Offset(0, 20),
+            spreadRadius: glow != null ? -6 : -22,
           ),
         ],
       ),
       child: child,
     );
+
     if (onTap == null) return card;
     return Material(
       color: Colors.transparent,
-      child: InkWell(borderRadius: VitaRadius.cardR, onTap: onTap, child: card),
+      child: InkWell(
+        borderRadius: br,
+        onTap: onTap,
+        splashColor: v.brand.withOpacity(0.06),
+        highlightColor: v.brand.withOpacity(0.03),
+        child: card,
+      ),
     );
   }
 }

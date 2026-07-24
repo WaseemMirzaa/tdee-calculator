@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../core/providers/app_providers.dart';
 import '../core/services/ads_service.dart';
 import '../core/theme/vita_theme.dart';
 
-/// A banner ad slot for the free tier. Renders nothing for premium users — the
-/// single [premiumProvider] flag removes all ads.
+/// A full-width banner ad bar, pinned at the bottom of the app (above the nav).
+/// The app is free and ad-supported, so this always shows once an ad loads;
+/// it renders nothing while loading or if the ad fails (never blocks the UI).
 class AdSlot extends ConsumerStatefulWidget {
   const AdSlot({super.key});
 
@@ -29,10 +29,6 @@ class _AdSlotState extends ConsumerState<AdSlot> {
     try {
       await AdsService.instance.init();
       final ad = AdsService.instance.createBanner();
-      ad.load().then((_) {
-        if (mounted) setState(() => _loaded = true);
-      });
-      // Mark loaded via listener too (createBanner disposes on failure).
       _ad = ad;
       await ad.load();
       if (mounted) setState(() => _loaded = true);
@@ -49,18 +45,21 @@ class _AdSlotState extends ConsumerState<AdSlot> {
 
   @override
   Widget build(BuildContext context) {
-    final isPremium = ref.watch(premiumProvider);
-    if (isPremium || _ad == null || !_loaded) return const SizedBox.shrink();
+    if (_ad == null || !_loaded) return const SizedBox.shrink();
+    final v = context.vita;
     return Container(
-      alignment: Alignment.center,
+      width: double.infinity,
       height: _ad!.size.height.toDouble(),
-      width: _ad!.size.width.toDouble(),
-      margin: const EdgeInsets.only(top: 8),
+      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: context.vita.card,
-        borderRadius: BorderRadius.circular(8),
+        color: v.card,
+        border: Border(bottom: BorderSide(color: v.lineSoft)),
       ),
-      child: AdWidget(ad: _ad!),
+      child: SizedBox(
+        width: _ad!.size.width.toDouble(),
+        height: _ad!.size.height.toDouble(),
+        child: AdWidget(ad: _ad!),
+      ),
     );
   }
 }

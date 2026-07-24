@@ -9,8 +9,9 @@ import '../../core/providers/app_providers.dart';
 import '../../router.dart';
 import '../../widgets/vita.dart';
 
-/// S5 · Home / Results dashboard. The number is the hero: a calorie ring, macro
-/// bars, an interactive PAL accordion, entry cards, and the metric grid.
+/// S5 · Home / Results dashboard. The number is the hero: a glowing calorie
+/// ring, macro bars, an interactive PAL accordion, entry cards, and the metric
+/// grid. Everything is free — no locks.
 class ResultsScreen extends ConsumerWidget {
   const ResultsScreen({super.key});
 
@@ -18,7 +19,6 @@ class ResultsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final result = ref.watch(resultProvider);
     final profile = ref.watch(profileProvider).valueOrNull;
-    final isPremium = ref.watch(premiumProvider);
     final v = context.vita;
 
     if (result == null) {
@@ -27,30 +27,44 @@ class ResultsScreen extends ConsumerWidget {
 
     final maintainModerate = result.macroMatrix[CalorieMode.maintain]![CarbProfile.moderate]!;
     final greeting = profile?.name != null && profile!.name!.isNotEmpty
-        ? 'Hi ${profile.name},'
+        ? 'Hi ${profile.name} 👋'
         : 'Your daily energy';
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
       children: [
         Row(
           children: [
-            Expanded(child: Text(greeting, style: context.vt.titleLarge)),
-            IconButton(
-              icon: Icon(Icons.settings_outlined, color: v.muted),
-              onPressed: () => ref.read(homeTabProvider.notifier).state = 3,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(greeting, style: context.vt.titleLarge),
+                  Text('Here’s your metabolic snapshot',
+                      style: TextStyle(color: v.muted, fontSize: 13)),
+                ],
+              ),
+            ),
+            _RoundIcon(
+              icon: Icons.settings_rounded,
+              onTap: () => ref.read(homeTabProvider.notifier).state = 3,
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        if (!isPremium) ...[
-          PremiumBanner(onTap: () => context.push(Routes.paywall)),
-          const SizedBox(height: 16),
-        ],
+        const SizedBox(height: 16),
 
-        // --- TDEE hero card ---
+        // --- TDEE hero card (glowing, brand-tinted) ---
         VitaCard(
-          padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
+          padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
+          glow: v.brand,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.lerp(v.card, v.brand, v.isDark ? 0.12 : 0.06)!,
+              v.card,
+            ],
+          ),
           child: Column(
             children: [
               Row(
@@ -61,12 +75,13 @@ class ResultsScreen extends ConsumerWidget {
                   Icon(Icons.info_outline_rounded, size: 15, color: v.muted),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               CalorieRing(
                 value: result.tdee,
+                size: 200,
                 fraction: result.tdee / result.palBreakdown[ActivityLevel.extreme]!,
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               MacroBars(
                 protein: maintainModerate.proteinG,
                 carbs: maintainModerate.carbG,
@@ -98,15 +113,34 @@ class ResultsScreen extends ConsumerWidget {
             subtitle: 'Maintain · cutting · bulking splits',
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 20),
 
-        const SectionLabel('Health metrics'),
-        const SizedBox(height: 10),
-        _MetricsGrid(result: result, isPremium: isPremium),
-
-        const SizedBox(height: 16),
-        const Center(child: AdSlot()),
+        const Padding(
+          padding: EdgeInsets.only(left: 2, bottom: 10),
+          child: SectionLabel('Health metrics'),
+        ),
+        _MetricsGrid(result: result),
       ],
+    );
+  }
+}
+
+class _RoundIcon extends StatelessWidget {
+  const _RoundIcon({required this.icon, required this.onTap});
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = context.vita;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(color: v.card, shape: BoxShape.circle, border: Border.all(color: v.line)),
+        child: Icon(icon, size: 20, color: v.inkSoft),
+      ),
     );
   }
 }
@@ -123,13 +157,18 @@ class _RowCard extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 46, height: 46,
+          width: 50,
+          height: 50,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: v.brand.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(13),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [v.brand.withOpacity(0.16), v.brand.withOpacity(0.06)],
+            ),
+            borderRadius: BorderRadius.circular(15),
           ),
-          child: Text(emoji, style: const TextStyle(fontSize: 22)),
+          child: Text(emoji, style: const TextStyle(fontSize: 24)),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -236,72 +275,62 @@ class _PalRow extends StatelessWidget {
             value: fraction,
             minHeight: 6,
             backgroundColor: v.lineSoft,
-            valueColor: const AlwaysStoppedAnimation(_palColor),
+            valueColor: const AlwaysStoppedAnimation(VitaColors.emerald),
           ),
         ),
       ],
     );
   }
-
-  static const _palColor = Color(0xFF0E9E6E);
 }
 
 class _MetricsGrid extends StatelessWidget {
-  const _MetricsGrid({required this.result, required this.isPremium});
+  const _MetricsGrid({required this.result});
   final TdeeResult result;
-  final bool isPremium;
 
   @override
   Widget build(BuildContext context) {
-    final bmiCat = _bmiLabel(result.bmiCategory);
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1.85,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1.5,
       children: [
-        // BMI is fully locked for free users → routes to paywall.
         MetricCard(
           label: 'BMI',
           value: result.bmi.toStringAsFixed(1),
-          caption: bmiCat,
-          locked: !isPremium,
-          onTap: () => _openMetric(context, 'bmi'),
+          caption: _bmiLabel(result.bmiCategory),
+          icon: Icons.speed_rounded,
+          accentColor: VitaColors.fat,
+          onTap: () => context.push('${Routes.metric}/bmi'),
         ),
         MetricCard(
           label: 'BMR',
           value: '${result.bmr.round()}',
           caption: 'kcal/day at rest',
-          locked: !isPremium,
-          onTap: () => _openMetric(context, 'bmr'),
+          icon: Icons.local_fire_department_rounded,
+          accentColor: VitaColors.ember,
+          onTap: () => context.push('${Routes.metric}/bmr'),
         ),
         MetricCard(
           label: 'RMR',
           value: '${result.rmr.round()}',
           caption: 'kcal/day resting',
-          locked: !isPremium,
-          onTap: () => _openMetric(context, 'rmr'),
+          icon: Icons.bedtime_rounded,
+          accentColor: VitaColors.protein,
+          onTap: () => context.push('${Routes.metric}/rmr'),
         ),
         MetricCard(
           label: 'IBW',
           value: '${result.ibw.minKg.round()}–${result.ibw.maxKg.round()}',
           caption: 'ideal range · kg',
-          locked: !isPremium,
-          onTap: () => _openMetric(context, 'ibw'),
+          icon: Icons.straighten_rounded,
+          accentColor: VitaColors.emerald,
+          onTap: () => context.push('${Routes.metric}/ibw'),
         ),
       ],
     );
-  }
-
-  void _openMetric(BuildContext context, String type) {
-    // BMI card is fully gated: free users go straight to the paywall.
-    if (!isPremium && type == 'bmi') {
-      context.push(Routes.paywall);
-      return;
-    }
-    context.push('${Routes.metric}/$type');
   }
 
   static String _bmiLabel(BmiCategory c) {

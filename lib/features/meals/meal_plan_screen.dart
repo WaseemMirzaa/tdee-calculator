@@ -176,45 +176,169 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
   }
 
   void _showShoppingList(List<PlannedDay> days) {
-    final totals = <String, double>{};
+    final seed = ref.read(seedProvider).valueOrNull;
+    final totals = <String, _ShopItem>{};
     for (final d in days) {
       for (final m in d.meals) {
         for (final ing in m.ingredients) {
-          totals.update(ing.name, (g) => g + (ing.grams ?? 0), ifAbsent: () => ing.grams ?? 0);
+          final cat = seed?.foodById(ing.foodId ?? '')?.category ?? 'other';
+          final existing = totals[ing.name];
+          if (existing == null) {
+            totals[ing.name] = _ShopItem(ing.name, ing.grams ?? 0, cat);
+          } else {
+            existing.grams += ing.grams ?? 0;
+          }
         }
       }
     }
-    final items = totals.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+    final items = totals.values.toList()
+      ..sort((a, b) => a.category == b.category
+          ? a.name.compareTo(b.name)
+          : a.category.compareTo(b.category));
+
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true, // critical — otherwise the sheet is tiny/clipped
       backgroundColor: context.vita.card,
       showDragHandle: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.6,
-        maxChildSize: 0.9,
-        builder: (context, controller) => ListView(
-          controller: controller,
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-          children: [
-            Text('Shopping list', style: context.vt.titleLarge),
-            Text('${items.length} items across ${days.length} days',
-                style: TextStyle(color: context.vita.muted, fontSize: 13)),
-            const SizedBox(height: 14),
-            for (final e in items)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 7),
-                child: Row(
-                  children: [
-                    Icon(Icons.circle_outlined, size: 16, color: context.vita.muted),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(e.key, style: TextStyle(color: context.vita.ink, fontSize: 14.5))),
-                    if (e.value > 0)
-                      Text('${e.value.round()} g', style: context.mono(size: 13, color: context.vita.muted)),
-                  ],
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (_) => _ShoppingSheet(items: items, dayCount: days.length),
+    );
+  }
+}
+
+/// One aggregated shopping-list line (grams summed across the plan).
+class _ShopItem {
+  _ShopItem(this.name, this.grams, this.category);
+  final String name;
+  double grams;
+  final String category;
+}
+
+/// An interactive, checkable shopping list. Ticking an item strikes it through.
+class _ShoppingSheet extends StatefulWidget {
+  const _ShoppingSheet({required this.items, required this.dayCount});
+  final List<_ShopItem> items;
+  final int dayCount;
+
+  @override
+  State<_ShoppingSheet> createState() => _ShoppingSheetState();
+}
+
+class _ShoppingSheetState extends State<_ShoppingSheet> {
+  final _checked = <String>{};
+
+  static String _catLabel(String c) {
+    const labels = {
+      'protein': 'Protein',
+      'carbs': 'Carbs',
+      'fat': 'Fats & oils',
+      'fruits': 'Fruits',
+      'vegetables': 'Vegetables',
+      'dairy': 'Dairy & drinks',
+      'other': 'Pantry & spices',
+    };
+    return labels[c] ?? 'Other';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final v = context.vita;
+    // Build a flat list of [category-header, ...items] entries.
+    final rows = <Widget>[];
+    String? lastCat;
+    for (final it in widget.items) {
+      if (it.category != lastCat) {
+        lastCat = it.category;
+        rows.add(Padding(
+          padding: const EdgeInsets.fromLTRB(2, 16, 2, 8),
+          child: SectionLabel(_catLabel(it.category)),
+        ));
+      }
+      final done = _checked.contains(it.name);
+      rows.add(
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => done ? _checked.remove(it.name) : _checked.add(it.name)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9),
+            child: Row(
+              children: [
+                AnimatedContainer(
+                  duration: VitaMotion.fast,
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: done ? v.brand : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: done ? v.brand : v.line, width: 1.6),
+                  ),
+                  child: done
+                      ? const Icon(Icons.check_rounded, size: 15, color: Colors.white)
+                      : null,
                 ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Text(
+                    it.name,
+                    style: TextStyle(
+                      color: done ? v.muted : v.ink,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      decoration: done ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                ),
+                if (it.grams > 0)
+                  Text('${it.grams.round()} g',
+                      style: context.mono(size: 13, color: v.muted)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SafeArea(
+      top: false,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.78),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 2, 22, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Shopping list', style: context.vt.titleLarge),
+                        Text(
+                          '${widget.items.length} items · ${widget.dayCount} days · ${_checked.length} ticked',
+                          style: TextStyle(color: v.muted, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 46,
+                    height: 46,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: v.brand.withOpacity(0.12), shape: BoxShape.circle),
+                    child: const Text('🛒', style: TextStyle(fontSize: 22)),
+                  ),
+                ],
               ),
+            ),
+            Flexible(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(22, 0, 22, 20),
+                children: rows,
+              ),
+            ),
           ],
         ),
       ),
