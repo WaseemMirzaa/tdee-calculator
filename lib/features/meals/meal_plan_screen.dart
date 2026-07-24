@@ -136,7 +136,10 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
               onPressed: () async {
                 await ref.read(planProvider.notifier).reset();
                 ref.read(selectedDietProvider.notifier).select('anything');
-                if (context.mounted) ref.read(homeTabProvider.notifier).state = 1;
+                if (!context.mounted) return;
+                // Land on the Meals tab (start state), never a blank pushed screen.
+                ref.read(homeTabProvider.notifier).state = 1;
+                context.go(Routes.home);
               },
               icon: Icon(Icons.refresh_rounded, size: 18, color: v.muted),
               label: Text('Reset & start over', style: TextStyle(color: v.muted)),

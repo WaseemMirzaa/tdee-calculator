@@ -52,7 +52,9 @@ class _CalculatingScreenState extends ConsumerState<CalculatingScreen>
   @override
   Widget build(BuildContext context) {
     final v = context.vita;
-    return Scaffold(
+    return PopScope(
+      canPop: false, // transient screen — auto-advances to Home
+      child: Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -91,6 +93,7 @@ class _CalculatingScreenState extends ConsumerState<CalculatingScreen>
             ),
           ],
         ),
+      ),
       ),
     );
   }

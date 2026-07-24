@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,7 +18,6 @@ import 'shell.dart';
 
 /// Route paths, in one place.
 class Routes {
-  static const splash = '/';
   static const welcome = '/welcome';
   static const profile = '/onboarding/profile';
   static const activity = '/onboarding/activity';
@@ -30,23 +30,37 @@ class Routes {
   static const foodPrefs = '/food-prefs';
   static const mealPlan = '/meal-plan';
   static const meal = '/meal'; // /meal/:id
+
+  /// Screens that are reachable before a profile exists.
+  static const onboarding = {welcome, profile, activity, calculating};
 }
 
 /// Which bottom-nav tab the home shell shows. Other screens can switch tabs.
 final homeTabProvider = StateProvider<int>((ref) => 0);
 
 final routerProvider = Provider<GoRouter>((ref) {
+  // Re-evaluate redirects whenever the persisted profile appears/disappears
+  // (onboarding completes, or "Reset all data" clears it).
+  final refresh = ValueNotifier<int>(0);
+  ref.onDispose(refresh.dispose);
+  ref.listen(profileProvider, (_, __) => refresh.value++);
+
   return GoRouter(
-    initialLocation: Routes.splash,
+    initialLocation: Routes.home,
+    refreshListenable: refresh,
+    // Global guard: no profile ⇒ must be in onboarding; has profile ⇒ never
+    // sit on the welcome screen. This makes relaunch and post-onboarding
+    // navigation deterministic regardless of how a screen was reached.
+    redirect: (context, state) {
+      final hasProfile = ref.read(profileProvider).valueOrNull != null;
+      final loc = state.matchedLocation;
+      if (!hasProfile) {
+        return Routes.onboarding.contains(loc) ? null : Routes.welcome;
+      }
+      if (loc == Routes.welcome) return Routes.home;
+      return null;
+    },
     routes: [
-      GoRoute(
-        path: Routes.splash,
-        redirect: (context, state) {
-          // Returning users (persisted profile) deep-link straight to Home.
-          final hasProfile = ref.read(profileProvider).valueOrNull != null;
-          return hasProfile ? Routes.home : Routes.welcome;
-        },
-      ),
       GoRoute(path: Routes.welcome, builder: (c, s) => const WelcomeScreen()),
       GoRoute(path: Routes.profile, builder: (c, s) => const ProfileScreen()),
       GoRoute(path: Routes.activity, builder: (c, s) => const ActivityScreen()),

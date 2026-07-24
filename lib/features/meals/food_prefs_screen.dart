@@ -47,7 +47,10 @@ class _FoodPrefsScreenState extends ConsumerState<FoodPrefsScreen> {
         );
     if (mounted) {
       setState(() => _busy = false);
-      context.go(Routes.mealPlan);
+      // Return to the shell and show the generated plan in the Meals tab —
+      // this clears the diet→likes screens from the stack so Back doesn't quit.
+      ref.read(homeTabProvider.notifier).state = 1;
+      context.go(Routes.home);
     }
   }
 

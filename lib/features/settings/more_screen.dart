@@ -129,7 +129,12 @@ class MoreScreen extends ConsumerWidget {
       ),
     );
     if (ok == true) {
-      await ref.read(profileProvider.notifier).clear();
+      await ref.read(profileProvider.notifier).clear(); // wipes every table
+      // Drop cached in-memory state so the next user starts truly clean.
+      ref.invalidate(planProvider);
+      ref.invalidate(favoritesProvider);
+      ref.invalidate(foodPrefsProvider);
+      ref.invalidate(weighInsProvider);
       ref.read(selectedDietProvider.notifier).select('anything');
       if (context.mounted) context.go(Routes.welcome);
     }

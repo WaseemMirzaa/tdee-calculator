@@ -59,19 +59,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  VitaCircleButton(icon: Icons.arrow_back_rounded, onPressed: _back),
-                  const SizedBox(width: 14),
-                  Expanded(child: StepProgressBar(current: _step + 1, total: 3)),
-                ],
-              ),
+    // Hardware back should walk the stepper back (step 2 → step 1) before
+    // leaving the screen.
+    return PopScope(
+      canPop: _step == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _step == 1) _back();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    VitaCircleButton(icon: Icons.arrow_back_rounded, onPressed: _back),
+                    const SizedBox(width: 14),
+                    Expanded(child: StepProgressBar(current: _step + 1, total: 3)),
+                  ],
+                ),
               Expanded(
                 child: PageView(
                   controller: _page,
@@ -89,6 +96,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );
