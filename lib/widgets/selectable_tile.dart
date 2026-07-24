@@ -70,7 +70,7 @@ class SelectableTile extends StatelessWidget {
                     opacity: selected ? 1 : 0,
                     child: Container(
                       width: 26, height: 26,
-                      decoration: const BoxDecoration(color: VitaColors.emerald, shape: BoxShape.circle),
+                      decoration: BoxDecoration(color: v.brand, shape: BoxShape.circle),
                       child: const Icon(Icons.check_rounded, size: 17, color: Colors.white),
                     ),
                   ),

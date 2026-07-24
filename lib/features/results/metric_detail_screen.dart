@@ -185,7 +185,7 @@ class _BmiGauge extends StatelessWidget {
                   child: const Row(
                     children: [
                       Expanded(flex: 35, child: ColoredBox(color: VitaColors.fat, child: SizedBox(height: 10))),
-                      Expanded(flex: 65, child: ColoredBox(color: VitaColors.emerald, child: SizedBox(height: 10))),
+                      Expanded(flex: 65, child: ColoredBox(color: VitaColors.good, child: SizedBox(height: 10))),
                       Expanded(flex: 50, child: ColoredBox(color: VitaColors.carbs, child: SizedBox(height: 10))),
                       Expanded(flex: 100, child: ColoredBox(color: VitaColors.crit, child: SizedBox(height: 10))),
                     ],

@@ -14,6 +14,10 @@ permissions:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    env:
+      # Presence check for the optional release keystore (secrets can't be used
+      # directly in step `if:`, so surface it as a job-level env var).
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,14 +41,45 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate launcher icons & splash
+        run: |
+          dart run flutter_launcher_icons
+          dart run flutter_native_splash:create
+
       - name: Analyze
         run: flutter analyze
 
       - name: Test
         run: flutter test
 
+      # Optional release signing: only runs when the keystore secret is present.
+      - name: Configure release signing
+        if: ${{ env.KEYSTORE_B64 != '' }}
+        env:
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > android/app/vita-release.jks
+          cat > android/key.properties <<EOF
+          storeFile=vita-release.jks
+          storePassword=$KS_PASS
+          keyAlias=$KS_ALIAS
+          keyPassword=$KEY_PASS
+          EOF
+
+      # Real AdMob unit ids come from secrets; the shell falls back to Google's
+      # public TEST ids when a secret is unset so the build always succeeds.
       - name: Build release APK
-        run: flutter build apk --release
+        env:
+          BANNER_ANDROID: ${{ secrets.ADMOB_BANNER_ANDROID }}
+          BANNER_IOS: ${{ secrets.ADMOB_BANNER_IOS }}
+        run: |
+          ANDROID_ID="${BANNER_ANDROID:-ca-app-pub-3940256099942544/6300978111}"
+          IOS_ID="${BANNER_IOS:-ca-app-pub-3940256099942544/2934735716}"
+          flutter build apk --release \
+            --dart-define=ADMOB_BANNER_ANDROID="$ANDROID_ID" \
+            --dart-define=ADMOB_BANNER_IOS="$IOS_ID"
 
       - name: Stage APK
         run: |
@@ -67,6 +102,7 @@ jobs:
             Automated release build of the Vita TDEE app.
             Direct download: **vita-tdee.apk** (asset below).
 
-            Signed with debug keys for testing. Replace with a production
-            keystore + real AdMob / billing IDs before store submission.
+            Signed with the release keystore when configured (repo secrets),
+            otherwise debug-signed for testing. Ad unit ids come from secrets
+            with Google test ids as the fallback.
           files: dist/vita-tdee.apk

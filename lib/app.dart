@@ -12,11 +12,12 @@ class VitaApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final scheme = ref.watch(schemeProvider);
     return MaterialApp.router(
       title: 'Vita',
       debugShowCheckedModeBanner: false,
-      theme: VitaTheme.light(),
-      darkTheme: VitaTheme.dark(),
+      theme: VitaTheme.light(scheme),
+      darkTheme: VitaTheme.dark(scheme),
       themeMode: themeMode,
       routerConfig: router,
     );

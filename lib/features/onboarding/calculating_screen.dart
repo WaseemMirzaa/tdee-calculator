@@ -64,11 +64,9 @@ class _CalculatingScreenState extends ConsumerState<CalculatingScreen>
               child: Container(
                 width: 96,
                 height: 96,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: SweepGradient(colors: [
-                    VitaColors.emerald, VitaColors.lime, VitaColors.emerald,
-                  ]),
+                  gradient: SweepGradient(colors: [v.brand, v.accent, v.brand]),
                 ),
                 child: Center(
                   child: Container(

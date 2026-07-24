@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../router.dart';
 import '../../widgets/vita.dart';
 
-/// S2 · Onboarding welcome. Original hero (an abstract energy bloom) + one
-/// honest promise + a single Start CTA. Sets the calm, premium tone.
+/// S2 · Onboarding welcome. A premium, scheme-aware hero + one honest promise.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -21,12 +19,12 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              const _EnergyBloom(),
+              const _HeroMark(),
               const Spacer(flex: 1),
               Text(
                 'Know your numbers.\nEat toward your goal.',
                 textAlign: TextAlign.center,
-                style: context.vt.headlineMedium?.copyWith(fontSize: 30),
+                style: context.vt.headlineMedium?.copyWith(fontSize: 31),
               ),
               const SizedBox(height: 16),
               Text(
@@ -36,9 +34,9 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const Spacer(flex: 2),
               VitaPrimaryButton(
-                label: 'Start',
+                label: 'Get started',
                 icon: Icons.arrow_forward_rounded,
-                onPressed: () => context.push(Routes.profile),
+                onPressed: () => context.push(Routes.onboard),
               ),
               const SizedBox(height: 12),
               Text('Takes about 30 seconds · no account needed',
@@ -51,53 +49,48 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-/// An original, license-free hero: a soft gradient bloom with an emoji cluster.
-class _EnergyBloom extends StatelessWidget {
-  const _EnergyBloom();
+/// A scheme-aware hero: a glowing brand orb with a bright ring accent.
+class _HeroMark extends StatelessWidget {
+  const _HeroMark();
 
   @override
   Widget build(BuildContext context) {
+    final v = context.vita;
     return SizedBox(
-      width: 220,
-      height: 220,
+      width: 230,
+      height: 230,
       child: Stack(
         alignment: Alignment.center,
         children: [
           Container(
-            width: 200,
-            height: 200,
+            width: 210,
+            height: 210,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: RadialGradient(
-                colors: [
-                  VitaColors.lime.withOpacity(0.55),
-                  VitaColors.emerald.withOpacity(0.12),
-                  Colors.transparent,
-                ],
+                colors: [v.accent.withOpacity(0.5), v.brand.withOpacity(0.12), Colors.transparent],
                 stops: const [0.0, 0.55, 1.0],
               ),
             ),
           ),
           Container(
-            width: 128,
-            height: 128,
+            width: 132,
+            height: 132,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [VitaColors.emerald, VitaColors.emeraldDeep],
+                colors: [v.brand, v.brandDeep],
               ),
-              boxShadow: [
-                BoxShadow(color: VitaColors.emerald.withOpacity(0.4), blurRadius: 40, spreadRadius: 4),
-              ],
+              boxShadow: [BoxShadow(color: v.brand.withOpacity(0.45), blurRadius: 44, spreadRadius: 4)],
             ),
             alignment: Alignment.center,
-            child: const Text('🔥', style: TextStyle(fontSize: 52)),
+            child: const Text('🔥', style: TextStyle(fontSize: 54)),
           ),
-          const Positioned(top: 8, right: 26, child: Text('🥑', style: TextStyle(fontSize: 30))),
-          const Positioned(bottom: 14, left: 18, child: Text('💪', style: TextStyle(fontSize: 30))),
-          const Positioned(bottom: 30, right: 10, child: Text('🍓', style: TextStyle(fontSize: 26))),
+          const Positioned(top: 8, right: 30, child: Text('🥑', style: TextStyle(fontSize: 30))),
+          const Positioned(bottom: 16, left: 22, child: Text('💪', style: TextStyle(fontSize: 30))),
+          const Positioned(bottom: 34, right: 14, child: Text('🍓', style: TextStyle(fontSize: 26))),
         ],
       ),
     );

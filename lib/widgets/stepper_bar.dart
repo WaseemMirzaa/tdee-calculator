@@ -21,7 +21,7 @@ class StepProgressBar extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(99),
                 gradient: i <= current
-                    ? const LinearGradient(colors: [VitaColors.emerald, VitaColors.lime])
+                    ? LinearGradient(colors: [v.brand, v.accent])
                     : null,
                 color: i <= current ? null : v.lineSoft,
               ),

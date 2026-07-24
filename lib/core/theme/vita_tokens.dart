@@ -47,7 +47,64 @@ class VitaColors {
   static const dLineSoft = Color(0xFF1C2721);
 }
 
-/// Semantic colour set resolved for the active brightness. Access via
+/// A selectable premium accent scheme (brand + deep + hero accent). The user
+/// picks one in Settings; it's persisted and drives every branded surface.
+class VitaScheme {
+  const VitaScheme({
+    required this.id,
+    required this.name,
+    required this.brandLight,
+    required this.brandDeepLight,
+    required this.brandDark,
+    required this.accent,
+  });
+
+  final String id;
+  final String name;
+  final Color brandLight; // brand on light ground
+  final Color brandDeepLight; // deeper brand for gradients
+  final Color brandDark; // brand on dark ground
+  final Color accent; // the single bright hero accent (the ring highlight)
+}
+
+/// Six curated premium schemes. Emerald is the default.
+const List<VitaScheme> kVitaSchemes = [
+  VitaScheme(
+    id: 'emerald', name: 'Emerald',
+    brandLight: Color(0xFF0E9E6E), brandDeepLight: Color(0xFF0B7C57),
+    brandDark: Color(0xFF25C088), accent: Color(0xFFCDE84B),
+  ),
+  VitaScheme(
+    id: 'indigo', name: 'Indigo',
+    brandLight: Color(0xFF5B6CF0), brandDeepLight: Color(0xFF3F4CC0),
+    brandDark: Color(0xFF8A97F7), accent: Color(0xFF6FE6FF),
+  ),
+  VitaScheme(
+    id: 'violet', name: 'Violet',
+    brandLight: Color(0xFF8B5CF6), brandDeepLight: Color(0xFF6D3EE0),
+    brandDark: Color(0xFFA78BFA), accent: Color(0xFFF3A9FF),
+  ),
+  VitaScheme(
+    id: 'sunset', name: 'Sunset',
+    brandLight: Color(0xFFF5623D), brandDeepLight: Color(0xFFD8431F),
+    brandDark: Color(0xFFFF7E57), accent: Color(0xFFFFC24A),
+  ),
+  VitaScheme(
+    id: 'rose', name: 'Rose',
+    brandLight: Color(0xFFF0508A), brandDeepLight: Color(0xFFD62E6E),
+    brandDark: Color(0xFFFF6FA3), accent: Color(0xFFFFB27A),
+  ),
+  VitaScheme(
+    id: 'ocean', name: 'Ocean',
+    brandLight: Color(0xFF0EA5B5), brandDeepLight: Color(0xFF077C88),
+    brandDark: Color(0xFF29C6D4), accent: Color(0xFF8CF0D0),
+  ),
+];
+
+VitaScheme schemeById(String? id) =>
+    kVitaSchemes.firstWhere((s) => s.id == id, orElse: () => kVitaSchemes.first);
+
+/// Semantic colour set resolved for the active brightness + scheme. Access via
 /// `context.vita` (see extension in vita_theme.dart).
 class VitaPalette {
   const VitaPalette({
@@ -62,55 +119,61 @@ class VitaPalette {
     required this.lineSoft,
     required this.brand,
     required this.brandDeep,
+    required this.accent,
   });
 
   final Brightness brightness;
   final Color ground; // scaffold background
-  final Color paper; // inset surfaces (screen background of phone)
+  final Color paper; // inset surfaces
   final Color card; // raised cards
   final Color ink; // primary text
   final Color inkSoft; // secondary text
   final Color muted; // tertiary text / captions
   final Color line; // borders
   final Color lineSoft; // faint dividers / tracks
-  final Color brand; // emerald resolved for brightness
-  final Color brandDeep;
+  final Color brand; // scheme brand resolved for brightness
+  final Color brandDeep; // deeper brand for gradients
+  final Color accent; // scheme hero accent (the ring highlight)
 
-  // Constant accents (identical across themes)
-  Color get lime => VitaColors.lime;
+  // Data / semantic colours (constant across schemes)
   Color get ember => VitaColors.ember;
   Color get protein => VitaColors.protein;
   Color get carbs => VitaColors.carbs;
   Color get fat => VitaColors.fat;
   bool get isDark => brightness == Brightness.dark;
 
-  static const light = VitaPalette(
-    brightness: Brightness.light,
-    ground: VitaColors.lPaper,
-    paper: VitaColors.lPaper,
-    card: VitaColors.lCard,
-    ink: VitaColors.lInk,
-    inkSoft: VitaColors.lInkSoft,
-    muted: VitaColors.lMuted,
-    line: VitaColors.lLine,
-    lineSoft: VitaColors.lLineSoft,
-    brand: VitaColors.emerald,
-    brandDeep: VitaColors.emeraldDeep,
-  );
+  /// The signature brand gradient (deep → brand → accent).
+  List<Color> get brandGradient => [brandDeep, brand, accent];
 
-  static const dark = VitaPalette(
-    brightness: Brightness.dark,
-    ground: VitaColors.dGround,
-    paper: VitaColors.dPaper,
-    card: VitaColors.dCard,
-    ink: VitaColors.dInk,
-    inkSoft: VitaColors.dInkSoft,
-    muted: VitaColors.dMuted,
-    line: VitaColors.dLine,
-    lineSoft: VitaColors.dLineSoft,
-    brand: VitaColors.emeraldDark,
-    brandDeep: VitaColors.emerald,
-  );
+  static VitaPalette light(VitaScheme s) => VitaPalette(
+        brightness: Brightness.light,
+        ground: VitaColors.lPaper,
+        paper: VitaColors.lPaper,
+        card: VitaColors.lCard,
+        ink: VitaColors.lInk,
+        inkSoft: VitaColors.lInkSoft,
+        muted: VitaColors.lMuted,
+        line: VitaColors.lLine,
+        lineSoft: VitaColors.lLineSoft,
+        brand: s.brandLight,
+        brandDeep: s.brandDeepLight,
+        accent: s.accent,
+      );
+
+  static VitaPalette dark(VitaScheme s) => VitaPalette(
+        brightness: Brightness.dark,
+        ground: VitaColors.dGround,
+        paper: VitaColors.dPaper,
+        card: VitaColors.dCard,
+        ink: VitaColors.dInk,
+        inkSoft: VitaColors.dInkSoft,
+        muted: VitaColors.dMuted,
+        line: VitaColors.dLine,
+        lineSoft: VitaColors.dLineSoft,
+        brand: s.brandDark,
+        brandDeep: s.brandLight,
+        accent: s.accent,
+      );
 }
 
 /// Spacing, radius and motion constants.

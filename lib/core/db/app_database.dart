@@ -210,7 +210,25 @@ class AppDatabase {
 
   // --- Settings (key/value) ----------------------------------------------
 
+  /// Synchronous mirror of the settings table, filled by [preloadSettings] at
+  /// startup so preference providers (theme, units, diet) read the persisted
+  /// value on the FIRST frame — no flash of defaults.
+  final Map<String, String> settingsCache = {};
+
+  Future<void> preloadSettings() async {
+    final db = await _database;
+    final rows = await db.query('settings');
+    settingsCache.clear();
+    for (final r in rows) {
+      settingsCache[r['key'] as String] = r['value'] as String;
+    }
+  }
+
+  /// Synchronous read from the preloaded cache.
+  String? getSettingSync(String key) => settingsCache[key];
+
   Future<void> setSetting(String key, String value) async {
+    settingsCache[key] = value;
     final db = await _database;
     await db.insert('settings', {'key': key, 'value': value},
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -224,6 +242,7 @@ class AppDatabase {
 
   /// Wipe everything (used by "Reset" flows).
   Future<void> clearAll() async {
+    settingsCache.clear();
     final db = await _database;
     final batch = db.batch();
     for (final t in ['profile', 'weigh_ins', 'food_prefs', 'favorites', 'plan_entries', 'settings']) {

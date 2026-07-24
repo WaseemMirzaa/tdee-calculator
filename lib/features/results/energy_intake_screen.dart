@@ -43,7 +43,7 @@ class EnergyIntakeScreen extends ConsumerWidget {
         children: [
           _EnergyCard(
             title: 'To lose weight',
-            color: VitaColors.emerald,
+            color: VitaColors.good,
             rows: [
               for (final r in _loseRows)
                 _RateData(r.$2, r.$3, result.loseTargets[r.$1]!, result.loseTargets[r.$1]! / maint),

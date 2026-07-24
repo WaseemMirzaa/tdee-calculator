@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'core/providers/app_providers.dart';
 import 'features/onboarding/welcome_screen.dart';
-import 'features/onboarding/profile_screen.dart';
-import 'features/onboarding/activity_screen.dart';
+import 'features/onboarding/onboarding_flow.dart';
 import 'features/onboarding/calculating_screen.dart';
 import 'features/results/energy_intake_screen.dart';
 import 'features/results/macros_screen.dart';
@@ -19,8 +18,7 @@ import 'shell.dart';
 /// Route paths, in one place.
 class Routes {
   static const welcome = '/welcome';
-  static const profile = '/onboarding/profile';
-  static const activity = '/onboarding/activity';
+  static const onboard = '/onboarding';
   static const calculating = '/calculating';
   static const home = '/home';
   static const energy = '/energy';
@@ -32,7 +30,7 @@ class Routes {
   static const meal = '/meal'; // /meal/:id
 
   /// Screens that are reachable before a profile exists.
-  static const onboarding = {welcome, profile, activity, calculating};
+  static const onboarding = {welcome, onboard, calculating};
 }
 
 /// Which bottom-nav tab the home shell shows. Other screens can switch tabs.
@@ -62,8 +60,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: Routes.welcome, builder: (c, s) => const WelcomeScreen()),
-      GoRoute(path: Routes.profile, builder: (c, s) => const ProfileScreen()),
-      GoRoute(path: Routes.activity, builder: (c, s) => const ActivityScreen()),
+      GoRoute(path: Routes.onboard, builder: (c, s) => const OnboardingFlow()),
       GoRoute(path: Routes.calculating, builder: (c, s) => const CalculatingScreen()),
       GoRoute(path: Routes.home, builder: (c, s) => const HomeShell()),
       GoRoute(path: Routes.energy, builder: (c, s) => const EnergyIntakeScreen()),

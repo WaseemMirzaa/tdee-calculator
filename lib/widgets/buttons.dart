@@ -21,6 +21,7 @@ class VitaPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final v = context.vita;
     final enabled = onPressed != null && !loading;
     final child = AnimatedOpacity(
       duration: VitaMotion.fast,
@@ -30,14 +31,14 @@ class VitaPrimaryButton extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(VitaRadius.pill),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
-            colors: [VitaColors.emeraldDeep, VitaColors.emerald, VitaColors.lime],
+            colors: v.brandGradient,
           ),
           boxShadow: [
             BoxShadow(
-              color: VitaColors.emerald.withOpacity(0.32),
+              color: v.brand.withOpacity(0.32),
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),

@@ -6,12 +6,14 @@ import 'vita_tokens.dart';
 class VitaTheme {
   const VitaTheme._();
 
-  static ThemeData light() => _build(VitaPalette.light);
-  static ThemeData dark() => _build(VitaPalette.dark);
+  static ThemeData light([VitaScheme? scheme]) =>
+      _build(VitaPalette.light(scheme ?? kVitaSchemes.first));
+  static ThemeData dark([VitaScheme? scheme]) =>
+      _build(VitaPalette.dark(scheme ?? kVitaSchemes.first));
 
   static ThemeData _build(VitaPalette p) {
     final scheme = ColorScheme.fromSeed(
-      seedColor: VitaColors.emerald,
+      seedColor: p.brand,
       brightness: p.brightness,
     ).copyWith(
       primary: p.brand,

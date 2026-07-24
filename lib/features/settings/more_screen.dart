@@ -68,7 +68,7 @@ class MoreScreen extends ConsumerWidget {
               if (profile != null) {
                 ref.read(onboardingDraftProvider.notifier).state = OnboardingDraft.fromProfile(profile);
               }
-              context.push(Routes.profile);
+              context.push(Routes.onboard);
             },
           ),
           _ToggleTile(
@@ -79,6 +79,12 @@ class MoreScreen extends ConsumerWidget {
           ),
           _ThemeTile(themeMode: themeMode, onChanged: (m) => ref.read(themeModeProvider.notifier).set(m)),
         ]),
+        const SizedBox(height: 12),
+
+        _SchemePicker(
+          selected: ref.watch(schemeProvider),
+          onSelect: (s) => ref.read(schemeProvider.notifier).select(s),
+        ),
         const SizedBox(height: 12),
 
         _Group(children: [
@@ -234,6 +240,67 @@ class _ThemeTile extends StatelessWidget {
                 VitaSegment(ThemeMode.dark, 'Dark'),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Accent-scheme picker: six premium colour swatches; tap to switch instantly.
+class _SchemePicker extends StatelessWidget {
+  const _SchemePicker({required this.selected, required this.onSelect});
+  final VitaScheme selected;
+  final ValueChanged<VitaScheme> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = context.vita;
+    return VitaCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.palette_outlined, color: v.brand, size: 22),
+              const SizedBox(width: 16),
+              Text('Accent colour', style: TextStyle(fontWeight: FontWeight.w600, color: v.ink, fontSize: 15)),
+              const Spacer(),
+              Text(selected.name, style: TextStyle(color: v.muted, fontSize: 13, fontWeight: FontWeight.w600)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              for (final s in kVitaSchemes)
+                GestureDetector(
+                  onTap: () => onSelect(s),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 160),
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [s.brandLight, s.accent],
+                      ),
+                      border: Border.all(
+                        color: s.id == selected.id ? v.ink : Colors.transparent,
+                        width: 3,
+                      ),
+                      boxShadow: [
+                        BoxShadow(color: s.brandLight.withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: s.id == selected.id
+                        ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                        : null,
+                  ),
+                ),
+            ],
           ),
         ],
       ),

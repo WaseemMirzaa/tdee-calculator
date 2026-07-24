@@ -152,15 +152,12 @@ class _MealPlanBodyState extends ConsumerState<MealPlanBody> {
 
   Future<void> _addDay(int current, double target) async {
     setState(() => _busy = true);
-    await ref.read(planProvider.notifier).regenerate(
-          targetCalories: target,
-          days: current + 1,
-          seed: 7 + current,
-        );
+    // Append one day; existing days are preserved untouched.
+    final newDay = await ref.read(planProvider.notifier).appendDay(targetCalories: target);
     if (mounted) {
       setState(() {
         _busy = false;
-        _day = current + 1;
+        _day = newDay;
       });
     }
   }
@@ -479,15 +476,17 @@ class _MealCard extends StatelessWidget {
           ),
           Column(
             children: [
-              GestureDetector(
+              _IconTap(
+                tooltip: isFavorite ? 'Remove favorite' : 'Add to favorites',
+                icon: isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                color: isFavorite ? VitaColors.protein : v.muted,
                 onTap: onFavorite,
-                child: Icon(isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                    size: 20, color: isFavorite ? VitaColors.protein : v.muted),
               ),
-              const SizedBox(height: 14),
-              GestureDetector(
+              _IconTap(
+                tooltip: 'Swap meal',
+                icon: Icons.swap_horiz_rounded,
+                color: v.brand,
                 onTap: onSwap,
-                child: Icon(Icons.swap_horiz_rounded, size: 20, color: v.brand),
               ),
             ],
           ),
@@ -502,4 +501,29 @@ class _MealCard extends StatelessWidget {
         'dinner' => '🍽',
         _ => '🍎',
       };
+}
+
+/// A 44×44 accessible icon button (meets the minimum tap-target guideline).
+class _IconTap extends StatelessWidget {
+  const _IconTap({required this.icon, required this.color, required this.onTap, required this.tooltip});
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  final String tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: tooltip,
+      child: Tooltip(
+        message: tooltip,
+        child: InkResponse(
+          onTap: onTap,
+          radius: 26,
+          child: SizedBox(width: 44, height: 44, child: Icon(icon, size: 21, color: color)),
+        ),
+      ),
+    );
+  }
 }

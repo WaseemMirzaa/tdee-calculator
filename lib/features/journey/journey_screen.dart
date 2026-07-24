@@ -149,7 +149,7 @@ class _StatStrip extends StatelessWidget {
         Expanded(child: _stat(context, 'Current', '${currentKg.toStringAsFixed(1)} kg', v.ink)),
         const SizedBox(width: 10),
         Expanded(child: _stat(context, 'Change', change == null ? '—' : '${change > 0 ? '+' : ''}${change.toStringAsFixed(1)} kg',
-            change == null ? v.muted : (change <= 0 ? VitaColors.emerald : VitaColors.ember))),
+            change == null ? v.muted : (change <= 0 ? VitaColors.good : VitaColors.ember))),
         const SizedBox(width: 10),
         Expanded(child: _stat(context, 'Entries', '${weighIns.length}', v.ink)),
       ],
@@ -255,13 +255,13 @@ class _TrendCard extends StatelessWidget {
                   ),
                   LineChartBarData(
                     spots: trend, isCurved: true, curveSmoothness: 0.3,
-                    gradient: const LinearGradient(colors: [VitaColors.emerald, VitaColors.lime]),
+                    gradient: LinearGradient(colors: [v.brand, v.accent]),
                     barWidth: 3.5, dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
                         begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                        colors: [VitaColors.emerald.withOpacity(0.18), VitaColors.emerald.withOpacity(0)],
+                        colors: [v.brand.withOpacity(0.18), v.brand.withOpacity(0)],
                       ),
                     ),
                   ),

@@ -53,35 +53,56 @@ class ResultsScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
 
-        // --- TDEE hero card (glowing, brand-tinted) ---
+        // --- TDEE hero: a bold brand-gradient spotlight ---
         VitaCard(
-          padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
+          padding: const EdgeInsets.fromLTRB(18, 24, 18, 24),
           glow: v.brand,
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.lerp(v.card, v.brand, v.isDark ? 0.12 : 0.06)!,
-              v.card,
-            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [v.brandDeep, v.brand],
           ),
           child: Column(
             children: [
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SectionLabel('Total daily energy · TDEE'),
-                  const SizedBox(width: 6),
-                  Icon(Icons.info_outline_rounded, size: 15, color: v.muted),
+                  SectionLabel('Total daily energy · TDEE', color: Colors.white70),
+                  SizedBox(width: 6),
+                  Icon(Icons.info_outline_rounded, size: 15, color: Colors.white54),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               CalorieRing(
                 value: result.tdee,
-                size: 200,
+                size: 204,
                 fraction: result.tdee / result.palBreakdown[ActivityLevel.extreme]!,
+                trackColor: Colors.white.withOpacity(0.22),
+                arcColors: [v.accent, Colors.white],
+                textColor: Colors.white,
+                labelColor: Colors.white70,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 6),
+              Text('Maintenance · what holds your weight steady',
+                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12.5)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // --- Macros at maintenance ---
+        VitaCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const SectionLabel('Macros at maintenance'),
+                  const Spacer(),
+                  Text('moderate carbs', style: TextStyle(color: v.muted, fontSize: 12)),
+                ],
+              ),
+              const SizedBox(height: 14),
               MacroBars(
                 protein: maintainModerate.proteinG,
                 carbs: maintainModerate.carbG,
@@ -275,7 +296,7 @@ class _PalRow extends StatelessWidget {
             value: fraction,
             minHeight: 6,
             backgroundColor: v.lineSoft,
-            valueColor: const AlwaysStoppedAnimation(VitaColors.emerald),
+            valueColor: AlwaysStoppedAnimation(v.brand),
           ),
         ),
       ],
@@ -326,7 +347,7 @@ class _MetricsGrid extends StatelessWidget {
           value: '${result.ibw.minKg.round()}–${result.ibw.maxKg.round()}',
           caption: 'ideal range · kg',
           icon: Icons.straighten_rounded,
-          accentColor: VitaColors.emerald,
+          accentColor: VitaColors.good,
           onTap: () => context.push('${Routes.metric}/ibw'),
         ),
       ],

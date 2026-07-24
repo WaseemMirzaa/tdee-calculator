@@ -15,7 +15,7 @@ class VitaCard extends StatelessWidget {
     this.accent = false,
     this.glow,
     this.gradient,
-    this.radius = VitaRadius.card,
+    this.radius = 24,
   });
 
   final Widget child;
@@ -36,8 +36,9 @@ class VitaCard extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            v.card,
-            Color.lerp(v.card, v.ground, v.isDark ? 0.42 : 0.5)!,
+            // A subtle glass sheen: a touch lighter at the top, settling to card.
+            v.isDark ? Color.lerp(v.card, Colors.white, 0.05)! : Colors.white,
+            v.isDark ? v.card : Color.lerp(v.card, v.ground, 0.38)!,
           ],
         );
 

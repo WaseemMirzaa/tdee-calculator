@@ -45,6 +45,10 @@ class CalorieRing extends StatelessWidget {
     this.fraction = 0.72,
     this.size = 190,
     this.emoji = '🔥',
+    this.trackColor,
+    this.arcColors,
+    this.textColor,
+    this.labelColor,
   });
 
   final double value;
@@ -52,6 +56,10 @@ class CalorieRing extends StatelessWidget {
   final double fraction;
   final double size;
   final String emoji;
+  final Color? trackColor;
+  final List<Color>? arcColors;
+  final Color? textColor;
+  final Color? labelColor;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +77,11 @@ class CalorieRing extends StatelessWidget {
             curve: VitaMotion.curve,
             builder: (context, f, _) => CustomPaint(
               size: Size(size, size),
-              painter: _RingPainter(fraction: f, track: v.lineSoft),
+              painter: _RingPainter(
+                fraction: f,
+                track: trackColor ?? v.lineSoft,
+                arc: arcColors ?? [v.brand, v.accent],
+              ),
             ),
           ),
           Column(
@@ -77,8 +89,9 @@ class CalorieRing extends StatelessWidget {
             children: [
               Text(emoji, style: const TextStyle(fontSize: 18)),
               const SizedBox(height: 2),
-              CountUpText(value: value, size: size * 0.21),
-              Text(label.toUpperCase(), style: context.monoLabel(size: 10)),
+              CountUpText(value: value, size: size * 0.21, color: textColor),
+              Text(label.toUpperCase(),
+                  style: context.monoLabel(size: 10, color: labelColor ?? v.muted)),
             ],
           ),
         ],
@@ -88,9 +101,10 @@ class CalorieRing extends StatelessWidget {
 }
 
 class _RingPainter extends CustomPainter {
-  _RingPainter({required this.fraction, required this.track});
+  _RingPainter({required this.fraction, required this.track, required this.arc});
   final double fraction;
   final Color track;
+  final List<Color> arc;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -108,9 +122,8 @@ class _RingPainter extends CustomPainter {
 
     final sweep = 2 * math.pi * fraction;
     final arcPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [VitaColors.emerald, VitaColors.lime],
-      ).createShader(Rect.fromCircle(center: center, radius: radius))
+      ..shader = LinearGradient(colors: arc)
+          .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round;
@@ -124,5 +137,6 @@ class _RingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_RingPainter old) => old.fraction != fraction || old.track != track;
+  bool shouldRepaint(_RingPainter old) =>
+      old.fraction != fraction || old.track != track || old.arc != arc;
 }

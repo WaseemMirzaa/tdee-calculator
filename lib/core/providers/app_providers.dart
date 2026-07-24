@@ -6,8 +6,8 @@ import '../models/meal.dart';
 import '../models/seed_data.dart';
 import '../meal_planner.dart';
 import '../seed_loader.dart';
-import '../services/purchase_service.dart';
 import '../tdee_engine.dart';
+import '../theme/vita_tokens.dart';
 import '../util/units.dart';
 
 // ---------------------------------------------------------------------------
@@ -55,51 +55,16 @@ final hasProfileProvider = Provider<bool>((ref) {
 });
 
 // ---------------------------------------------------------------------------
-// Premium  (single source of truth gating every locked card and all ads)
-// ---------------------------------------------------------------------------
-
-class PremiumNotifier extends Notifier<bool> {
-  @override
-  bool build() {
-    _restore();
-    return false;
-  }
-
-  Future<void> _restore() async {
-    final v = await ref.read(dbProvider).getSetting('premium');
-    if (v == 'true') state = true;
-  }
-
-  void setPremium(bool value) {
-    state = value;
-    ref.read(dbProvider).setSetting('premium', '$value');
-  }
-}
-
-final premiumProvider = NotifierProvider<PremiumNotifier, bool>(PremiumNotifier.new);
-
-/// The store billing wrapper. Initialised in `main()`; grants entitlement to
-/// [premiumProvider] when a purchase or restore completes.
-final purchaseServiceProvider = Provider<PurchaseService>((ref) {
-  final service = PurchaseService();
-  ref.onDispose(service.dispose);
-  return service;
-});
-
-// ---------------------------------------------------------------------------
 // Unit system  (kg/cm ↔ lb/ft)  &  theme mode  — persisted preferences
 // ---------------------------------------------------------------------------
 
 class UnitNotifier extends Notifier<UnitSystem> {
   @override
   UnitSystem build() {
-    _restore();
-    return UnitSystem.metric;
-  }
-
-  Future<void> _restore() async {
-    final v = await ref.read(dbProvider).getSetting('units');
-    if (v == 'imperial') state = UnitSystem.imperial;
+    // Synchronous read from the preloaded cache — no flash of the default.
+    return ref.read(dbProvider).getSettingSync('units') == 'imperial'
+        ? UnitSystem.imperial
+        : UnitSystem.metric;
   }
 
   void toggle() => set(state == UnitSystem.metric ? UnitSystem.imperial : UnitSystem.metric);
@@ -115,14 +80,14 @@ final unitSystemProvider = NotifierProvider<UnitNotifier, UnitSystem>(UnitNotifi
 class ThemeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
-    _restore();
-    return ThemeMode.system;
-  }
-
-  Future<void> _restore() async {
-    final v = await ref.read(dbProvider).getSetting('theme');
-    if (v == 'dark') state = ThemeMode.dark;
-    if (v == 'light') state = ThemeMode.light;
+    switch (ref.read(dbProvider).getSettingSync('theme')) {
+      case 'dark':
+        return ThemeMode.dark;
+      case 'light':
+        return ThemeMode.light;
+      default:
+        return ThemeMode.system;
+    }
   }
 
   void set(ThemeMode m) {
@@ -133,20 +98,27 @@ class ThemeNotifier extends Notifier<ThemeMode> {
 
 final themeModeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(ThemeNotifier.new);
 
+/// The selected premium accent scheme (persisted, read synchronously so there
+/// is no flash of the default on launch).
+class SchemeNotifier extends Notifier<VitaScheme> {
+  @override
+  VitaScheme build() => schemeById(ref.read(dbProvider).getSettingSync('scheme'));
+
+  void select(VitaScheme s) {
+    state = s;
+    ref.read(dbProvider).setSetting('scheme', s.id);
+  }
+}
+
+final schemeProvider = NotifierProvider<SchemeNotifier, VitaScheme>(SchemeNotifier.new);
+
 // ---------------------------------------------------------------------------
 // Meals: selected diet, food likes, generated plan, favorites
 // ---------------------------------------------------------------------------
 
 class DietNotifier extends Notifier<String?> {
   @override
-  String? build() {
-    _restore();
-    return null;
-  }
-
-  Future<void> _restore() async {
-    state = await ref.read(dbProvider).getSetting('diet');
-  }
+  String? build() => ref.read(dbProvider).getSettingSync('diet');
 
   void select(String dietId) {
     state = dietId;
@@ -236,6 +208,31 @@ class PlanNotifier extends AsyncNotifier<List<PlannedDay>> {
     );
     await _persist(planned);
     state = AsyncData(planned);
+  }
+
+  /// Append a single new day to the existing plan, keeping all prior days
+  /// exactly as they are. Returns the new day's number.
+  Future<int> appendDay({required double targetCalories, bool includeSnack = false}) async {
+    final existing = [...?state.valueOrNull];
+    final seedData = await ref.read(seedProvider.future);
+    final dietId = ref.read(selectedDietProvider) ?? 'anything';
+    final likes = ref.read(foodPrefsProvider).valueOrNull ?? <String>{};
+    final nextDay = existing.isEmpty ? 1 : existing.map((d) => d.dayNumber).reduce((a, b) => a > b ? a : b) + 1;
+    // Vary the seed by day count so the new day differs from prior ones.
+    final generated = MealPlanner.generate(
+      allMeals: seedData.meals,
+      dietId: dietId,
+      likedFoodIds: likes,
+      targetCalories: targetCalories,
+      days: 1,
+      includeSnack: includeSnack,
+      seed: 100 + nextDay,
+    );
+    final newDay = PlannedDay(dayNumber: nextDay, meals: generated.first.meals);
+    final updated = [...existing, newDay];
+    await _persist(updated);
+    state = AsyncData(updated);
+    return nextDay;
   }
 
   /// Swap a single meal in [dayNumber] at [slot] for another candidate.

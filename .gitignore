@@ -21,3 +21,8 @@ dartsdk-extract/
 # Generated
 *.g.dart
 coverage/
+
+# Release signing secrets — never commit
+android/key.properties
+**/*.jks
+**/*.keystore

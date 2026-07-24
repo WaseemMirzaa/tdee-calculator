@@ -32,7 +32,7 @@ class SelectChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (selected) ...[
-              const Icon(Icons.check_rounded, size: 15, color: VitaColors.emerald),
+              Icon(Icons.check_rounded, size: 15, color: v.brand),
               const SizedBox(width: 5),
             ],
             Text(label,
