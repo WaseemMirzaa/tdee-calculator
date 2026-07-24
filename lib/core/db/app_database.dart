@@ -16,6 +16,38 @@ class PlanEntry {
   final String type;
 }
 
+/// A pantry item the user has on hand. [days] is the supply duration in days
+/// (0 = "have it", with no countdown); the remaining supply is *derived* from
+/// the number of calendar days elapsed since [startMillis], so it deducts one
+/// day automatically each day with no background job.
+class KitchenItem {
+  const KitchenItem({required this.item, this.days = 0, this.startMillis = 0});
+
+  final String item;
+  final int days; // 0 => have-it, untracked
+  final int startMillis; // date-only epoch millis when the supply was set
+
+  bool get tracked => days > 0;
+
+  static DateTime _dateOnly(DateTime t) => DateTime(t.year, t.month, t.day);
+
+  /// Days of supply left today (null when untracked). Never negative.
+  int? remainingDays([DateTime? now]) {
+    if (days <= 0) return null;
+    final start = _dateOnly(DateTime.fromMillisecondsSinceEpoch(startMillis));
+    final today = _dateOnly(now ?? DateTime.now());
+    final left = days - today.difference(start).inDays;
+    return left < 0 ? 0 : left;
+  }
+
+  /// The calendar day the supply is expected to run out (null when untracked).
+  DateTime? runOutDate() {
+    if (days <= 0) return null;
+    final start = _dateOnly(DateTime.fromMillisecondsSinceEpoch(startMillis));
+    return start.add(Duration(days: days));
+  }
+}
+
 /// The app's single local SQL database. Raw SQL, no codegen. Stores everything
 /// the app needs offline: the profile, food likes, the generated meal plan,
 /// meal favorites, weigh-ins, and a simple key/value settings table.
@@ -24,7 +56,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const _dbName = 'vita.db';
-  static const _dbVersion = 2;
+  static const _dbVersion = 3;
 
   Database? _db;
 
@@ -44,6 +76,12 @@ class AppDatabase {
   Future<void> _onUpgrade(Database db, int oldV, int newV) async {
     if (oldV < 2) {
       await db.execute('CREATE TABLE IF NOT EXISTS kitchen (item TEXT PRIMARY KEY)');
+    }
+    if (oldV < 3) {
+      // Per-item supply tracking: how many days of the item the user has, and
+      // when they set it. Existing rows become untracked "have it" (days = 0).
+      await db.execute('ALTER TABLE kitchen ADD COLUMN days INTEGER NOT NULL DEFAULT 0');
+      await db.execute('ALTER TABLE kitchen ADD COLUMN start_millis INTEGER NOT NULL DEFAULT 0');
     }
   }
 
@@ -79,23 +117,34 @@ class AppDatabase {
         PRIMARY KEY (day, slot)
       )''');
     await db.execute('CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT)');
-    await db.execute('CREATE TABLE kitchen (item TEXT PRIMARY KEY)');
+    await db.execute(
+        'CREATE TABLE kitchen (item TEXT PRIMARY KEY, days INTEGER NOT NULL DEFAULT 0, start_millis INTEGER NOT NULL DEFAULT 0)');
   }
 
   // --- Kitchen / pantry (items the user already has) ----------------------
 
-  Future<Set<String>> loadKitchen() async {
+  Future<List<KitchenItem>> loadKitchen() async {
     final db = await _database;
     final rows = await db.query('kitchen');
-    return rows.map((r) => r['item'] as String).toSet();
+    return rows
+        .map((r) => KitchenItem(
+              item: r['item'] as String,
+              days: (r['days'] as int?) ?? 0,
+              startMillis: (r['start_millis'] as int?) ?? 0,
+            ))
+        .toList();
   }
 
-  Future<void> setKitchen(Set<String> items) async {
+  Future<void> setKitchen(List<KitchenItem> items) async {
     final db = await _database;
     final batch = db.batch();
     batch.delete('kitchen');
     for (final it in items) {
-      batch.insert('kitchen', {'item': it});
+      batch.insert('kitchen', {
+        'item': it.item,
+        'days': it.days,
+        'start_millis': it.startMillis,
+      });
     }
     await batch.commit(noResult: true);
   }

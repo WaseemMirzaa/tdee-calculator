@@ -27,10 +27,11 @@ class MetricCard extends StatelessWidget {
     final v = context.vita;
     return VitaCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
       radius: 18,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
@@ -48,14 +49,37 @@ class MetricCard extends StatelessWidget {
               Icon(Icons.north_east_rounded, size: 15, color: v.muted),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(label.toUpperCase(), style: context.monoLabel(size: 10)),
-          const SizedBox(height: 3),
-          Text(value, style: context.mono(size: 19, color: v.ink)),
-          if (caption != null) ...[
-            const SizedBox(height: 2),
-            Text(caption!, style: TextStyle(fontSize: 11.5, color: v.muted)),
-          ],
+          const SizedBox(height: 10),
+          // Title + value + caption grouped so the row above can flex.
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.visible,
+                softWrap: false,
+                style: context.monoLabel(size: 10),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.mono(size: 19, color: v.ink),
+              ),
+              if (caption != null) ...[
+                const SizedBox(height: 3),
+                Text(
+                  caption!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 11.5, color: v.muted),
+                ),
+              ],
+            ],
+          ),
         ],
       ),
     );

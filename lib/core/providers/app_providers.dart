@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,6 +8,7 @@ import '../models/meal.dart';
 import '../models/seed_data.dart';
 import '../meal_planner.dart';
 import '../seed_loader.dart';
+import '../services/notification_service.dart';
 import '../tdee_engine.dart';
 import '../theme/vita_tokens.dart';
 import '../util/units.dart';
@@ -160,27 +163,67 @@ class FavoritesNotifier extends AsyncNotifier<Set<String>> {
 final favoritesProvider =
     AsyncNotifierProvider<FavoritesNotifier, Set<String>>(FavoritesNotifier.new);
 
-/// Items the user already has in their kitchen/pantry. Persisted, so the
-/// shopping list's "have this" ticks survive app restarts.
-class KitchenNotifier extends AsyncNotifier<Set<String>> {
+/// Items the user already has in their kitchen/pantry, keyed by name. Persisted,
+/// so the shopping list's "have this" ticks — and each item's supply-in-days —
+/// survive app restarts. Remaining supply is derived from elapsed days, so it
+/// deducts automatically; changes reschedule per-item low-stock notifications.
+class KitchenNotifier extends AsyncNotifier<Map<String, KitchenItem>> {
   @override
-  Future<Set<String>> build() => ref.read(dbProvider).loadKitchen();
+  Future<Map<String, KitchenItem>> build() async {
+    final list = await ref.read(dbProvider).loadKitchen();
+    return {for (final k in list) k.item: k};
+  }
 
+  int get _leadDays =>
+      int.tryParse(ref.read(dbProvider).getSettingSync('shop_lead_days') ?? '2') ?? 2;
+
+  Future<void> _commit(Map<String, KitchenItem> next) async {
+    await ref.read(dbProvider).setKitchen(next.values.toList());
+    state = AsyncData(next);
+    // Reschedule per-item low-stock reminders off the new state.
+    unawaited(NotificationService.instance
+        .syncKitchenReminders(next.values.toList(), leadDays: _leadDays));
+  }
+
+  /// Add/remove an item from the kitchen (untracked "have it").
   Future<void> toggle(String item) async {
-    final current = {...?state.valueOrNull};
-    current.contains(item) ? current.remove(item) : current.add(item);
-    await ref.read(dbProvider).setKitchen(current);
-    state = AsyncData(current);
+    final next = {...?state.valueOrNull};
+    if (next.containsKey(item)) {
+      next.remove(item);
+      unawaited(NotificationService.instance.cancelKitchenItem(item));
+    } else {
+      next[item] = KitchenItem(item: item);
+    }
+    await _commit(next);
+  }
+
+  /// Set how many days of supply the user has of [item]. 0 = untracked "have
+  /// it"; > 0 starts a countdown from today that deducts automatically.
+  Future<void> setDays(String item, int days) async {
+    final next = {...?state.valueOrNull};
+    final now = DateTime.now();
+    final startMs = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    next[item] = KitchenItem(item: item, days: days, startMillis: startMs);
+    await _commit(next);
+  }
+
+  /// Re-evaluate reminders (e.g. after the reminder lead-time changed).
+  Future<void> rescheduleReminders() async {
+    final items = state.valueOrNull;
+    if (items == null) return;
+    await NotificationService.instance
+        .syncKitchenReminders(items.values.toList(), leadDays: _leadDays);
   }
 
   Future<void> clear() async {
-    await ref.read(dbProvider).setKitchen({});
+    await ref.read(dbProvider).setKitchen(const []);
     state = const AsyncData({});
+    unawaited(NotificationService.instance.cancelAllKitchenReminders());
   }
 }
 
 final kitchenProvider =
-    AsyncNotifierProvider<KitchenNotifier, Set<String>>(KitchenNotifier.new);
+    AsyncNotifierProvider<KitchenNotifier, Map<String, KitchenItem>>(KitchenNotifier.new);
 
 /// The generated meal plan. Rebuilds from persisted entries on launch;
 /// [regenerate] creates a fresh plan from the current diet + likes + goal and

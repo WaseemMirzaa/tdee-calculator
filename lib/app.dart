@@ -28,7 +28,7 @@ class VitaApp extends ConsumerWidget {
         final isDark = themeMode == ThemeMode.dark ||
             (themeMode == ThemeMode.system &&
                 MediaQuery.platformBrightnessOf(context) == Brightness.dark);
-        final ground = isDark ? VitaColors.dGround : VitaColors.lPaper;
+        final ground = (isDark ? VitaPalette.dark(scheme) : VitaPalette.light(scheme)).ground;
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: vitaOverlayStyle(isDark, ground),
           child: child ?? const SizedBox.shrink(),

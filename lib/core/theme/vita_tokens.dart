@@ -67,7 +67,9 @@ class VitaScheme {
   final Color accent; // the single bright hero accent (the ring highlight)
 }
 
-/// Six curated premium schemes. Emerald is the default.
+/// Ten curated premium schemes — each one recolours the *entire* surface set
+/// (grounds, cards, lines, text) toward its hue, not just the accent. Emerald
+/// is the default. The first six are the originals; the last four are new.
 const List<VitaScheme> kVitaSchemes = [
   VitaScheme(
     id: 'emerald', name: 'Emerald',
@@ -99,10 +101,59 @@ const List<VitaScheme> kVitaSchemes = [
     brandLight: Color(0xFF0EA5B5), brandDeepLight: Color(0xFF077C88),
     brandDark: Color(0xFF29C6D4), accent: Color(0xFF8CF0D0),
   ),
+  // --- New schemes ---
+  VitaScheme(
+    id: 'amber', name: 'Amber',
+    brandLight: Color(0xFFB5820E), brandDeepLight: Color(0xFF8A6209),
+    brandDark: Color(0xFFE7B94D), accent: Color(0xFFFFD66B),
+  ),
+  VitaScheme(
+    id: 'crimson', name: 'Crimson',
+    brandLight: Color(0xFFD62839), brandDeepLight: Color(0xFFA81E2C),
+    brandDark: Color(0xFFF25563), accent: Color(0xFFFF9E7A),
+  ),
+  VitaScheme(
+    id: 'slate', name: 'Slate',
+    brandLight: Color(0xFF566476), brandDeepLight: Color(0xFF3C4756),
+    brandDark: Color(0xFF9BAABC), accent: Color(0xFF7FD1E8),
+  ),
+  VitaScheme(
+    id: 'midnight', name: 'Midnight',
+    brandLight: Color(0xFF2E4B8F), brandDeepLight: Color(0xFF1E3266),
+    brandDark: Color(0xFF6C90E6), accent: Color(0xFF63E6FF),
+  ),
 ];
 
 VitaScheme schemeById(String? id) =>
     kVitaSchemes.firstWhere((s) => s.id == id, orElse: () => kVitaSchemes.first);
+
+/// Hue-free neutral surface bases. Each scheme tints these toward its brand so
+/// the whole app — not just the accent — takes on the scheme's colour.
+class _Neutral {
+  const _Neutral._();
+  // Light
+  static const lGround = Color(0xFFF3F3F5);
+  static const lCard = Color(0xFFFFFFFF);
+  static const lInk = Color(0xFF17181A);
+  static const lInkSoft = Color(0xFF3B3D40);
+  static const lMuted = Color(0xFF6C6E73);
+  static const lLine = Color(0xFFE2E2E6);
+  static const lLineSoft = Color(0xFFEDEDF0);
+  // Dark
+  static const dGround = Color(0xFF0C0D0F);
+  static const dPaper = Color(0xFF111214);
+  static const dCard = Color(0xFF17181B);
+  static const dInk = Color(0xFFECEDEF);
+  static const dInkSoft = Color(0xFFC3C5C9);
+  static const dMuted = Color(0xFF8B8D93);
+  static const dLine = Color(0xFF272A2E);
+  static const dLineSoft = Color(0xFF1B1D20);
+}
+
+/// Overlay [tint] onto [base] at opacity [t] — the tinting primitive used to
+/// bias neutral surfaces toward a scheme's hue.
+Color _mix(Color base, Color tint, double t) =>
+    Color.alphaBlend(tint.withOpacity(t), base);
 
 /// Semantic colour set resolved for the active brightness + scheme. Access via
 /// `context.vita` (see extension in vita_theme.dart).
@@ -145,35 +196,41 @@ class VitaPalette {
   /// The signature brand gradient (deep → brand → accent).
   List<Color> get brandGradient => [brandDeep, brand, accent];
 
-  static VitaPalette light(VitaScheme s) => VitaPalette(
-        brightness: Brightness.light,
-        ground: VitaColors.lPaper,
-        paper: VitaColors.lPaper,
-        card: VitaColors.lCard,
-        ink: VitaColors.lInk,
-        inkSoft: VitaColors.lInkSoft,
-        muted: VitaColors.lMuted,
-        line: VitaColors.lLine,
-        lineSoft: VitaColors.lLineSoft,
-        brand: s.brandLight,
-        brandDeep: s.brandDeepLight,
-        accent: s.accent,
-      );
+  static VitaPalette light(VitaScheme s) {
+    final t = s.brandLight; // tint hue for light surfaces
+    return VitaPalette(
+      brightness: Brightness.light,
+      ground: _mix(_Neutral.lGround, t, 0.055),
+      paper: _mix(_Neutral.lGround, t, 0.055),
+      card: _mix(_Neutral.lCard, t, 0.020),
+      ink: _mix(_Neutral.lInk, t, 0.10),
+      inkSoft: _mix(_Neutral.lInkSoft, t, 0.10),
+      muted: _mix(_Neutral.lMuted, t, 0.12),
+      line: _mix(_Neutral.lLine, t, 0.16),
+      lineSoft: _mix(_Neutral.lLineSoft, t, 0.10),
+      brand: s.brandLight,
+      brandDeep: s.brandDeepLight,
+      accent: s.accent,
+    );
+  }
 
-  static VitaPalette dark(VitaScheme s) => VitaPalette(
-        brightness: Brightness.dark,
-        ground: VitaColors.dGround,
-        paper: VitaColors.dPaper,
-        card: VitaColors.dCard,
-        ink: VitaColors.dInk,
-        inkSoft: VitaColors.dInkSoft,
-        muted: VitaColors.dMuted,
-        line: VitaColors.dLine,
-        lineSoft: VitaColors.dLineSoft,
-        brand: s.brandDark,
-        brandDeep: s.brandLight,
-        accent: s.accent,
-      );
+  static VitaPalette dark(VitaScheme s) {
+    final t = s.brandDark; // brighter hue reads on deep grounds
+    return VitaPalette(
+      brightness: Brightness.dark,
+      ground: _mix(_Neutral.dGround, t, 0.08),
+      paper: _mix(_Neutral.dPaper, t, 0.09),
+      card: _mix(_Neutral.dCard, t, 0.11),
+      ink: _mix(_Neutral.dInk, t, 0.05),
+      inkSoft: _mix(_Neutral.dInkSoft, t, 0.07),
+      muted: _mix(_Neutral.dMuted, t, 0.13),
+      line: _mix(_Neutral.dLine, t, 0.18),
+      lineSoft: _mix(_Neutral.dLineSoft, t, 0.13),
+      brand: s.brandDark,
+      brandDeep: s.brandLight,
+      accent: s.accent,
+    );
+  }
 }
 
 /// Spacing, radius and motion constants.

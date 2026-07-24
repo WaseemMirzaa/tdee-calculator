@@ -273,8 +273,9 @@ class _SchemePicker extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: 14,
+            runSpacing: 14,
             children: [
               for (final s in kVitaSchemes)
                 GestureDetector(
