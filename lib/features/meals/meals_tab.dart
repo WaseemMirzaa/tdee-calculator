@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/meal_planner.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../../router.dart';
@@ -15,7 +16,7 @@ class MealsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final plan = ref.watch(planProvider).valueOrNull ?? const [];
+    final plan = ref.watch(planProvider).valueOrNull ?? const <PlannedDay>[];
     final v = context.vita;
 
     if (plan.isNotEmpty) {

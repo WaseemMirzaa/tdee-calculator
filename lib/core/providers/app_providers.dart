@@ -166,7 +166,7 @@ class FoodPrefsNotifier extends AsyncNotifier<Set<String>> {
   }
 
   Future<void> toggle(String id) async {
-    final current = {...(state.valueOrNull ?? {})};
+    final current = {...?state.valueOrNull};
     current.contains(id) ? current.remove(id) : current.add(id);
     await setAll(current);
   }
@@ -240,7 +240,7 @@ class PlanNotifier extends AsyncNotifier<List<PlannedDay>> {
 
   /// Swap a single meal in [dayNumber] at [slot] for another candidate.
   Future<void> swapMeal(int dayNumber, int slot, Meal replacement) async {
-    final days = [...(state.valueOrNull ?? [])];
+    final days = [...?state.valueOrNull];
     final idx = days.indexWhere((d) => d.dayNumber == dayNumber);
     if (idx == -1) return;
     final meals = [...days[idx].meals];
