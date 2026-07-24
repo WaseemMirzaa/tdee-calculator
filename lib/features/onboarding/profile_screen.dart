@@ -39,8 +39,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
-  OnboardingDraft get _draft => ref.read(onboardingDraftProvider);
-
   void _next() {
     if (_step == 0) {
       setState(() => _step = 1);
@@ -435,7 +433,7 @@ class _RoundBtn extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: v.line),
         ),
-        child: Icon(icon, size: 18, color: enabled ? v.ink : v.muted.withValues(alpha: 0.4)),
+        child: Icon(icon, size: 18, color: enabled ? v.ink : v.muted.withOpacity(0.4)),
       ),
     );
   }

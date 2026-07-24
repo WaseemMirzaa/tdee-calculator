@@ -320,7 +320,7 @@ class _MealCard extends StatelessWidget {
             width: 52, height: 52,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: v.brand.withValues(alpha: 0.1),
+              color: v.brand.withOpacity(0.1),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(_mealEmoji(meal.type), style: const TextStyle(fontSize: 24)),

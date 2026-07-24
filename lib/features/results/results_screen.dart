@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/tdee_engine.dart';
+import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../../router.dart';
@@ -82,7 +83,7 @@ class ResultsScreen extends ConsumerWidget {
         // --- Entry cards ---
         VitaCard(
           onTap: () => context.push(Routes.energy),
-          child: _RowCard(
+          child: const _RowCard(
             emoji: '🥗',
             title: 'Energy to lose or gain',
             subtitle: 'Targets for every rate of change',
@@ -91,7 +92,7 @@ class ResultsScreen extends ConsumerWidget {
         const SizedBox(height: 12),
         VitaCard(
           onTap: () => context.push(Routes.macros),
-          child: _RowCard(
+          child: const _RowCard(
             emoji: '🍽',
             title: 'Macronutrients',
             subtitle: 'Maintain · cutting · bulking splits',
@@ -125,7 +126,7 @@ class _RowCard extends StatelessWidget {
           width: 46, height: 46,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: v.brand.withValues(alpha: 0.1),
+            color: v.brand.withOpacity(0.1),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Text(emoji, style: const TextStyle(fontSize: 22)),

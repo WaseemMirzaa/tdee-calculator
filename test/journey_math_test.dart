@@ -72,9 +72,9 @@ void main() {
 
   test('smoothedTrend returns one point per weigh-in and dampens noise', () {
     final w = [
-      WeighIn(id: 1, dateMillis: 1, weightKg: 64),
-      WeighIn(id: 2, dateMillis: 2, weightKg: 66), // spike
-      WeighIn(id: 3, dateMillis: 3, weightKg: 64),
+      const WeighIn(id: 1, dateMillis: 1, weightKg: 64),
+      const WeighIn(id: 2, dateMillis: 2, weightKg: 66), // spike
+      const WeighIn(id: 3, dateMillis: 3, weightKg: 64),
     ];
     final t = JourneyMath.smoothedTrend(w, alpha: 0.35);
     expect(t.length, 3);

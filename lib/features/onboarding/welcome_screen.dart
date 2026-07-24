@@ -70,8 +70,8 @@ class _EnergyBloom extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  VitaColors.lime.withValues(alpha: 0.55),
-                  VitaColors.emerald.withValues(alpha: 0.12),
+                  VitaColors.lime.withOpacity(0.55),
+                  VitaColors.emerald.withOpacity(0.12),
                   Colors.transparent,
                 ],
                 stops: const [0.0, 0.55, 1.0],
@@ -89,7 +89,7 @@ class _EnergyBloom extends StatelessWidget {
                 colors: [VitaColors.emerald, VitaColors.emeraldDeep],
               ),
               boxShadow: [
-                BoxShadow(color: VitaColors.emerald.withValues(alpha: 0.4), blurRadius: 40, spreadRadius: 4),
+                BoxShadow(color: VitaColors.emerald.withOpacity(0.4), blurRadius: 40, spreadRadius: 4),
               ],
             ),
             alignment: Alignment.center,

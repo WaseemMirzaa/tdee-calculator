@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/models/diet.dart';
-import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';
 import '../../router.dart';
 import '../../widgets/vita.dart';

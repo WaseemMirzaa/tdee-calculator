@@ -42,7 +42,7 @@ class _JourneyScreenState extends ConsumerState<JourneyScreen> {
     final currentKg = weighIns.isNotEmpty ? weighIns.last.weightKg : profile.weightKg;
     final target = _targetKg ?? _defaultTarget(currentKg, profile.goal);
     final losing = target < currentKg;
-    final dailyDelta = (losing ? -1 : 1) * JourneyMath.dailyDeltaForRate(_rate);
+    final dailyDelta = (losing ? -1 : 1) * TdeeCalculator.dailyDeltaForRate(_rate);
     final weeks = JourneyMath.weeksToGoal(currentKg: currentKg, targetKg: target, dailyDeltaKcal: dailyDelta);
     final date = JourneyMath.projectedDate(
         currentKg: currentKg, targetKg: target, dailyDeltaKcal: dailyDelta, from: DateTime.now());
@@ -254,7 +254,7 @@ class _TrendCard extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: raw, isCurved: false, color: v.muted.withValues(alpha: 0.5),
+                    spots: raw, isCurved: false, color: v.muted.withOpacity(0.5),
                     barWidth: 1.5, dotData: FlDotData(
                       show: true,
                       getDotPainter: (s, _, __, ___) => FlDotCirclePainter(radius: 2.5, color: v.muted),
@@ -268,7 +268,7 @@ class _TrendCard extends StatelessWidget {
                       show: true,
                       gradient: LinearGradient(
                         begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                        colors: [VitaColors.emerald.withValues(alpha: 0.18), VitaColors.emerald.withValues(alpha: 0)],
+                        colors: [VitaColors.emerald.withOpacity(0.18), VitaColors.emerald.withOpacity(0)],
                       ),
                     ),
                   ),
@@ -457,7 +457,7 @@ class _AdaptiveCard extends StatelessWidget {
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: v.brand.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(99)),
+                decoration: BoxDecoration(color: v.brand.withOpacity(0.14), borderRadius: BorderRadius.circular(99)),
                 child: Text('PRO', style: context.monoLabel(size: 9, color: v.brandDeep)),
               ),
             ],

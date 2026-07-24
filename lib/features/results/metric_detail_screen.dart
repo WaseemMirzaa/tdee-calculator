@@ -189,8 +189,8 @@ class _BmiGauge extends StatelessWidget {
                 right: 0,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(99),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Expanded(flex: 35, child: ColoredBox(color: VitaColors.fat, child: SizedBox(height: 10))),
                       Expanded(flex: 65, child: ColoredBox(color: VitaColors.emerald, child: SizedBox(height: 10))),
                       Expanded(flex: 50, child: ColoredBox(color: VitaColors.carbs, child: SizedBox(height: 10))),

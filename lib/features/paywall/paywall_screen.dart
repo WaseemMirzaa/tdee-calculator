@@ -64,7 +64,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: const LinearGradient(colors: [VitaColors.emerald, VitaColors.lime]),
-                  boxShadow: [BoxShadow(color: VitaColors.emerald.withValues(alpha: 0.4), blurRadius: 26)],
+                  boxShadow: [BoxShadow(color: VitaColors.emerald.withOpacity(0.4), blurRadius: 26)],
                 ),
                 child: const Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 34),
               ),

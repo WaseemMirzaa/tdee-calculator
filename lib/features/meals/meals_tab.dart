@@ -49,7 +49,7 @@ class MealsTab extends ConsumerWidget {
               width: 96, height: 96,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: v.brand.withValues(alpha: 0.1),
+                color: v.brand.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: const Text('🍽', style: TextStyle(fontSize: 44)),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/theme/vita_tokens.dart';
-import '../core/theme/vita_theme.dart';
 
 /// The "Go Pro" upsell banner. Shown only to free users (caller gates on
 /// [premiumProvider]). Original copy — not the competitor's microcopy.
@@ -35,7 +34,7 @@ class PremiumBanner extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(99),
                 ),
                 child: const Row(

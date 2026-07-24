@@ -173,7 +173,7 @@ class _StepsList extends StatelessWidget {
                 Container(
                   width: 26, height: 26,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(color: v.brand.withValues(alpha: 0.14), shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: v.brand.withOpacity(0.14), shape: BoxShape.circle),
                   child: Text('${i + 1}', style: context.mono(size: 13, color: v.brandDeep)),
                 ),
                 const SizedBox(width: 12),
@@ -199,7 +199,7 @@ class _ScaleBtn extends StatelessWidget {
       child: Container(
         width: 36, height: 36,
         decoration: BoxDecoration(color: v.card, shape: BoxShape.circle, border: Border.all(color: v.line)),
-        child: Icon(icon, size: 18, color: onTap == null ? v.muted.withValues(alpha: 0.4) : v.ink),
+        child: Icon(icon, size: 18, color: onTap == null ? v.muted.withOpacity(0.4) : v.ink),
       ),
     );
   }

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../db/app_database.dart';
 import '../models/meal.dart';
 import '../models/seed_data.dart';
-import '../models/weigh_in.dart';
 import '../meal_planner.dart';
 import '../seed_loader.dart';
 import '../services/purchase_service.dart';

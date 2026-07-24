@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/tdee_engine.dart';
 import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../core/providers/app_providers.dart';

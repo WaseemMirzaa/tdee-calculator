@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'core/theme/vita_tokens.dart';
 import 'core/theme/vita_theme.dart';
 import 'features/results/results_screen.dart';
 import 'features/meals/meals_tab.dart';

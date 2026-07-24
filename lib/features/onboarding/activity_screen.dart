@@ -40,11 +40,11 @@ class ActivityScreen extends ConsumerWidget {
                 children: [
                   VitaCircleButton(icon: Icons.arrow_back_rounded, onPressed: () => context.pop()),
                   const SizedBox(width: 14),
-                  Expanded(child: StepProgressBar(current: 3, total: 3)),
+                  const Expanded(child: StepProgressBar(current: 3, total: 3)),
                 ],
               ),
               const SizedBox(height: 24),
-              Align(
+              const Align(
                 alignment: Alignment.centerLeft,
                 child: SectionHeading(
                   title: 'How active are you?',

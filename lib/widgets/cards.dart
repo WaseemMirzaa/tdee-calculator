@@ -26,10 +26,10 @@ class VitaCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: v.card,
         borderRadius: VitaRadius.cardR,
-        border: Border.all(color: accent ? v.brand.withValues(alpha: 0.4) : v.line),
+        border: Border.all(color: accent ? v.brand.withOpacity(0.4) : v.line),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: v.isDark ? 0.35 : 0.05),
+            color: Colors.black.withOpacity(v.isDark ? 0.35 : 0.05),
             blurRadius: 30,
             offset: const Offset(0, 14),
             spreadRadius: -18,

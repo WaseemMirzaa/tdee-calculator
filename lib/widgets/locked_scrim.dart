@@ -33,7 +33,7 @@ class LockedScrim extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
               child: Container(
                 alignment: Alignment.center,
-                color: v.card.withValues(alpha: 0.55),
+                color: v.card.withOpacity(0.55),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -42,9 +42,9 @@ class LockedScrim extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                       decoration: BoxDecoration(
-                        color: v.brand.withValues(alpha: 0.16),
+                        color: v.brand.withOpacity(0.16),
                         borderRadius: BorderRadius.circular(VitaRadius.pill),
-                        border: Border.all(color: v.brand.withValues(alpha: 0.4)),
+                        border: Border.all(color: v.brand.withOpacity(0.4)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

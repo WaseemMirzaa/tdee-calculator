@@ -37,7 +37,7 @@ class VitaPrimaryButton extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: VitaColors.emerald.withValues(alpha: 0.32),
+              color: VitaColors.emerald.withOpacity(0.32),
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),

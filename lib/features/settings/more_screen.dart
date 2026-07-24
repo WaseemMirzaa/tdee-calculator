@@ -36,7 +36,7 @@ class MoreScreen extends ConsumerWidget {
               Container(
                 width: 50, height: 50,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: v.brand.withValues(alpha: 0.12), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: v.brand.withOpacity(0.12), shape: BoxShape.circle),
                 child: Text(
                   (profile?.name?.isNotEmpty ?? false) ? profile!.name![0].toUpperCase() : '🙂',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: v.brandDeep),

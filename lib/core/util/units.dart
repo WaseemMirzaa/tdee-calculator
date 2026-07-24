@@ -2,6 +2,8 @@
 /// (kg + cm); imperial is a display concern. The kg/cm ↔ lb/ft toggle is a
 /// first-class differentiator over the competitor.
 
+library;
+
 enum UnitSystem { metric, imperial }
 
 class Units {

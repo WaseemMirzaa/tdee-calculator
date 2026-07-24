@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/vita_tokens.dart';
 import '../../core/theme/vita_theme.dart';
 import '../../router.dart';
-import '../../widgets/vita.dart';
 
 /// A branded interstitial (~1.4s) while the result settles — turning a
 /// millisecond of compute into a moment of anticipation before the reveal.

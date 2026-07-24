@@ -1,4 +1,6 @@
 /// Barrel export for the Vita shared design-system widgets.
+library;
+
 export 'ad_slot.dart';
 export 'buttons.dart';
 export 'calorie_ring.dart';

@@ -36,7 +36,7 @@ class SelectableTile extends StatelessWidget {
           curve: VitaMotion.curve,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
           decoration: BoxDecoration(
-            color: selected ? v.brand.withValues(alpha: 0.08) : (v.isDark ? v.lineSoft : const Color(0xFFF0EEE4)),
+            color: selected ? v.brand.withOpacity(0.08) : (v.isDark ? v.lineSoft : const Color(0xFFF0EEE4)),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: selected ? v.brand : Colors.transparent,

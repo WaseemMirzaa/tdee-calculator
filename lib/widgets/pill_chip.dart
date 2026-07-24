@@ -24,7 +24,7 @@ class SelectChip extends StatelessWidget {
         duration: VitaMotion.fast,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? v.brand.withValues(alpha: 0.14) : (v.isDark ? v.lineSoft : const Color(0xFFF0EEE4)),
+          color: selected ? v.brand.withOpacity(0.14) : (v.isDark ? v.lineSoft : const Color(0xFFF0EEE4)),
           borderRadius: BorderRadius.circular(VitaRadius.pill),
           border: Border.all(color: selected ? v.brand : Colors.transparent, width: 1.4),
         ),
