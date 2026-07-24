@@ -106,7 +106,7 @@ class MoreScreen extends ConsumerWidget {
           ),
         ]),
         const SizedBox(height: 18),
-        Center(child: Text('Vita · v1.0.0', style: context.mono(size: 12, color: v.muted))),
+        Center(child: Text('Vita TDEE · v1.0.0', style: context.mono(size: 12, color: v.muted))),
       ],
     );
   }

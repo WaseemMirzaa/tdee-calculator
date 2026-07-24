@@ -16,7 +16,7 @@ class VitaApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final scheme = ref.watch(schemeProvider);
     return MaterialApp.router(
-      title: 'Vita',
+      title: 'Vita TDEE',
       debugShowCheckedModeBanner: false,
       theme: VitaTheme.light(scheme),
       darkTheme: VitaTheme.dark(scheme),

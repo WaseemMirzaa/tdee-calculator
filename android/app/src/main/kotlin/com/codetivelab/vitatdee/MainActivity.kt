@@ -1,4 +1,4 @@
-package com.codetivelab.vita_tdee
+package com.codetivelab.vitatdee
 
 import io.flutter.embedding.android.FlutterActivity
 
