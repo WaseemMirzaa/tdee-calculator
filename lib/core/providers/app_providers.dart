@@ -84,12 +84,14 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
     switch (ref.read(dbProvider).getSettingSync('theme')) {
-      case 'dark':
-        return ThemeMode.dark;
       case 'light':
         return ThemeMode.light;
-      default:
+      case 'system':
         return ThemeMode.system;
+      case 'dark':
+      default:
+        // Vita TDEE ships dark-first: default to dark until the user chooses.
+        return ThemeMode.dark;
     }
   }
 
